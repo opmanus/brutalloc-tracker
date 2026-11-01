@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brut_black">#FF000000</color>
+    <color name="brut_white">#FFFFFFFF</color>
+    <color name="brut_yellow">#FFFFFF00</color>
+    <color name="brut_red">#FFFF0000</color>
+    <color name="brut_green">#FF00FF00</color>
+    <color name="brut_blue">#FF0000FF</color>
+    <color name="brut_magenta">#FFFF00FF</color>
+</resources>
