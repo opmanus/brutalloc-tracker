@@ -5,22 +5,21 @@ import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,8 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -44,26 +41,29 @@ import com.brutal.tracker.ui.components.BrutalButton
 import com.brutal.tracker.ui.components.BrutalCard
 import com.brutal.tracker.ui.components.BrutalInputField
 import com.brutal.tracker.ui.components.BrutalPill
-import com.brutal.tracker.ui.theme.BrutalBlack
-import com.brutal.tracker.ui.theme.BrutalBlue
-import com.brutal.tracker.ui.theme.BrutalDarkBg
-import com.brutal.tracker.ui.theme.BrutalDarkBorder
-import com.brutal.tracker.ui.theme.BrutalDarkCard
-import com.brutal.tracker.ui.theme.BrutalDarkCardGreen
-import com.brutal.tracker.ui.theme.BrutalDarkCardMagenta
-import com.brutal.tracker.ui.theme.BrutalDarkCardRed
-import com.brutal.tracker.ui.theme.BrutalDarkCardYellow
-import com.brutal.tracker.ui.theme.BrutalGreen
-import com.brutal.tracker.ui.theme.BrutalLightBg
-import com.brutal.tracker.ui.theme.BrutalLightCard
-import com.brutal.tracker.ui.theme.BrutalLightCardGreen
-import com.brutal.tracker.ui.theme.BrutalLightCardMagenta
-import com.brutal.tracker.ui.theme.BrutalLightCardRed
-import com.brutal.tracker.ui.theme.BrutalLightCardYellow
-import com.brutal.tracker.ui.theme.BrutalMagenta
-import com.brutal.tracker.ui.theme.BrutalRed
-import com.brutal.tracker.ui.theme.BrutalWhite
-import com.brutal.tracker.ui.theme.BrutalYellow
+import com.brutal.tracker.ui.theme.AccentAmber
+import com.brutal.tracker.ui.theme.AccentCyan
+import com.brutal.tracker.ui.theme.AccentGreen
+import com.brutal.tracker.ui.theme.AccentPurple
+import com.brutal.tracker.ui.theme.AccentRose
+import com.brutal.tracker.ui.theme.DarkBg
+import com.brutal.tracker.ui.theme.DarkBorder
+import com.brutal.tracker.ui.theme.DarkCard
+import com.brutal.tracker.ui.theme.DarkCardCyan
+import com.brutal.tracker.ui.theme.DarkCardGreen
+import com.brutal.tracker.ui.theme.DarkCardPurple
+import com.brutal.tracker.ui.theme.DarkCardRose
+import com.brutal.tracker.ui.theme.DarkText
+import com.brutal.tracker.ui.theme.DarkTextMuted
+import com.brutal.tracker.ui.theme.LightBg
+import com.brutal.tracker.ui.theme.LightBorder
+import com.brutal.tracker.ui.theme.LightCard
+import com.brutal.tracker.ui.theme.LightCardCyan
+import com.brutal.tracker.ui.theme.LightCardGreen
+import com.brutal.tracker.ui.theme.LightCardPurple
+import com.brutal.tracker.ui.theme.LightCardRose
+import com.brutal.tracker.ui.theme.LightText
+import com.brutal.tracker.ui.theme.LightTextMuted
 
 @Composable
 fun MainScreen(
@@ -74,14 +74,16 @@ fun MainScreen(
     val serviceState by LocationService.serviceState.collectAsState()
     val isDark = isSystemInDarkTheme()
 
-    val screenBg = if (isDark) BrutalDarkBg else BrutalLightBg
-    val textColor = if (isDark) BrutalWhite else BrutalBlack
-    val borderColor = if (isDark) BrutalDarkBorder else BrutalBlack
-    val cardBg = if (isDark) BrutalDarkCard else BrutalLightCard
-    val yellowCardBg = if (isDark) BrutalDarkCardYellow else BrutalLightCardYellow
-    val redCardBg = if (isDark) BrutalDarkCardRed else BrutalLightCardRed
-    val magentaCardBg = if (isDark) BrutalDarkCardMagenta else BrutalLightCardMagenta
-    val greenCardBg = if (isDark) BrutalDarkCardGreen else BrutalLightCardGreen
+    val screenBg = if (isDark) DarkBg else LightBg
+    val textColor = if (isDark) DarkText else LightText
+    val textMutedColor = if (isDark) DarkTextMuted else LightTextMuted
+    val borderColor = if (isDark) DarkBorder else LightBorder
+    val cardBg = if (isDark) DarkCard else LightCard
+
+    val cardCyanBg = if (isDark) DarkCardCyan else LightCardCyan
+    val cardRoseBg = if (isDark) DarkCardRose else LightCardRose
+    val cardPurpleBg = if (isDark) DarkCardPurple else LightCardPurple
+    val cardGreenBg = if (isDark) DarkCardGreen else LightCardGreen
 
     var deviceName by remember { mutableStateOf("Arka's Phone") }
     var passphrase by remember { mutableStateOf("hackme-if-you-can") }
@@ -90,323 +92,325 @@ fun MainScreen(
 
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(screenBg)
-            .systemBarsPadding()
-            .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        // Brutalist Header
-        Box(
+    Scaffold(
+        containerColor = screenBg,
+        contentWindowInsets = WindowInsets.safeDrawing
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .drawBehind {
-                    val shadowPx = 5.dp.toPx()
-                    drawRect(BrutalBlack, Offset(shadowPx, shadowPx), size)
-                }
-                .background(if (isDark) BrutalDarkCard else BrutalBlack, RoundedCornerShape(0.dp))
-                .border(3.dp, borderColor, RoundedCornerShape(0.dp))
-                .padding(16.dp)
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "BRUTAL//TRACK",
-                        color = BrutalWhite,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = (-1).sp
-                    )
+            // Header Bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(cardBg, RoundedCornerShape(8.dp))
+                    .border(1.dp, borderColor, RoundedCornerShape(8.dp))
+                    .padding(16.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "ARKA//TRACK",
+                                color = textColor,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = (-0.5).sp
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "AES-256-GCM E2EE TELEMETRY",
+                                color = AccentCyan,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp
+                            )
+                        }
 
-                    if (serviceState.isTracking) {
-                        BrutalPill("LIVE", BrutalGreen, BrutalBlack)
-                    } else {
-                        BrutalPill("OFFLINE", BrutalRed, BrutalBlack)
+                        if (serviceState.isTracking) {
+                            BrutalPill("LIVE", AccentGreen)
+                        } else {
+                            BrutalPill("STANDBY", AccentRose)
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Main Broadcast Trigger Button
+            if (!serviceState.isTracking) {
+                BrutalButton(
+                    text = "⚡ START BROADCAST",
+                    onClick = {
+                        val config = TrackerConfig(
+                            deviceName = deviceName.trim(),
+                            passphrase = passphrase.trim(),
+                            brokerHost = brokerHost.trim(),
+                            brokerPort = 1883,
+                            updateIntervalSec = updateIntervalSec
+                        )
+                        onStartService(config)
+                    },
+                    backgroundColor = AccentCyan,
+                    textColor = DarkBg,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                BrutalButton(
+                    text = "⛔ TERMINATE BROADCAST",
+                    onClick = onStopService,
+                    backgroundColor = AccentRose,
+                    textColor = DarkBg,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Status Stream Message
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(cardBg, RoundedCornerShape(6.dp))
+                    .border(1.dp, borderColor, RoundedCornerShape(6.dp))
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
+            ) {
                 Text(
-                    text = "AES-256-GCM E2EE GPS STREAMER",
-                    color = BrutalYellow,
+                    text = "> " + serviceState.statusMessage,
+                    color = if (serviceState.isTracking) AccentGreen else textMutedColor,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
-        // Big Action Button
-        if (!serviceState.isTracking) {
-            BrutalButton(
-                text = "⚡ START BROADCAST",
-                onClick = {
-                    val config = TrackerConfig(
-                        deviceName = deviceName.trim(),
-                        passphrase = passphrase.trim(),
-                        brokerHost = brokerHost.trim(),
-                        brokerPort = 1883,
-                        updateIntervalSec = updateIntervalSec
-                    )
-                    onStartService(config)
-                },
-                backgroundColor = BrutalYellow,
-                textColor = BrutalBlack,
-                modifier = Modifier.fillMaxWidth()
-            )
-        } else {
-            BrutalButton(
-                text = "⛔ TERMINATE BROADCAST",
-                onClick = onStopService,
-                backgroundColor = BrutalRed,
-                textColor = BrutalWhite,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Status Banner
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(if (isDark) BrutalDarkCard else BrutalBlack)
-                .border(2.dp, borderColor)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
+            // Section Label
             Text(
-                text = "> " + serviceState.statusMessage,
-                color = if (serviceState.isTracking) BrutalGreen else BrutalYellow,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp
+                text = "LIVE TELEMETRY HUD",
+                fontWeight = FontWeight.Black,
+                fontSize = 15.sp,
+                color = textColor,
+                letterSpacing = (-0.2).sp
             )
-        }
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            val pkt = serviceState.lastPacket
 
-        // TELEMETRY HUD
-        Text(
-            text = "TELEMETRY HUD",
-            fontWeight = FontWeight.Black,
-            fontSize = 18.sp,
-            color = textColor,
-            letterSpacing = (-0.5).sp
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val pkt = serviceState.lastPacket
-
-        // Row 1: Coordinates Card
-        BrutalCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = cardBg,
-            borderColor = borderColor,
-            shadowOffset = 4.dp
-        ) {
-            Column {
-                Text(
-                    text = "COORDINATES (WGS84)",
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Black,
-                    fontSize = 11.sp,
-                    color = textColor
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                val coordsText = if (pkt != null) "%.5f, %.5f".format(pkt.lat, pkt.lon) else "WAITING FOR GPS..."
-                Text(
-                    text = coordsText,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Black,
-                    fontSize = 20.sp,
-                    color = textColor
-                )
-                if (pkt != null) {
-                    Text(
-                        text = "BEARING: ${pkt.bearing.toInt()}° | ALT: ${pkt.alt.toInt()}M",
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                        color = textColor.copy(alpha = 0.8f)
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Row 2: Speedometer & Accuracy Card
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Speed Card
+            // Row 1: Coordinates Card
             BrutalCard(
-                modifier = Modifier.weight(1f),
-                backgroundColor = redCardBg,
-                borderColor = borderColor,
-                shadowOffset = 4.dp
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = cardCyanBg,
+                borderColor = borderColor
             ) {
                 Column {
                     Text(
-                        text = "VELOCITY",
-                        fontWeight = FontWeight.Black,
+                        text = "COORDINATES (WGS84)",
+                        fontFamily = FontFamily.SansSerif,
+                        fontWeight = FontWeight.Bold,
                         fontSize = 11.sp,
-                        color = textColor
+                        color = textMutedColor
                     )
-                    val speedKmh = if (pkt != null) (pkt.spd * 3.6).toInt() else 0
+                    Spacer(modifier = Modifier.height(4.dp))
+                    val coordsText = if (pkt != null) "%.5f, %.5f".format(pkt.lat, pkt.lon) else "AWAITING GPS FIX..."
                     Text(
-                        text = "$speedKmh KM/H",
+                        text = coordsText,
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Black,
-                        fontSize = 22.sp,
+                        fontSize = 20.sp,
                         color = textColor
                     )
+                    if (pkt != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "BEARING: ${pkt.bearing.toInt()}° | ALT: ${pkt.alt.toInt()}M",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 12.sp,
+                            color = textMutedColor
+                        )
+                    }
                 }
             }
 
-            // Accuracy Card
-            BrutalCard(
-                modifier = Modifier.weight(1f),
-                backgroundColor = magentaCardBg,
-                borderColor = borderColor,
-                shadowOffset = 4.dp
-            ) {
-                Column {
-                    Text(
-                        text = "GPS ACCURACY",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 11.sp,
-                        color = textColor
-                    )
-                    val accText = if (pkt != null) "±${pkt.acc.toInt()} M" else "±-- M"
-                    Text(
-                        text = accText,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 22.sp,
-                        color = textColor
-                    )
-                }
-            }
-        }
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Device Telemetry Card
-        BrutalCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = greenCardBg,
-            borderColor = borderColor,
-            shadowOffset = 4.dp
-        ) {
+            // Row 2: Speedometer & Accuracy Card
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Speed Card
+                BrutalCard(
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = cardRoseBg,
+                    borderColor = borderColor
+                ) {
+                    Column {
+                        Text(
+                            text = "VELOCITY",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            color = textMutedColor
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        val speedKmh = if (pkt != null) (pkt.spd * 3.6).toInt() else 0
+                        Text(
+                            text = "$speedKmh KM/H",
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 20.sp,
+                            color = textColor
+                        )
+                    }
+                }
+
+                // Accuracy Card
+                BrutalCard(
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = cardPurpleBg,
+                    borderColor = borderColor
+                ) {
+                    Column {
+                        Text(
+                            text = "ACCURACY",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            color = textMutedColor
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        val accText = if (pkt != null) "±${pkt.acc.toInt()} M" else "±-- M"
+                        Text(
+                            text = accText,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 20.sp,
+                            color = textColor
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Device Telemetry Card
+            BrutalCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = cardGreenBg,
+                borderColor = borderColor
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text("BATTERY", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = textMutedColor)
+                        val batText = if (pkt != null) "${pkt.battery}%" + if (pkt.isCharging) " ⚡" else "" else "--%"
+                        Text(batText, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("PINGS TRANSMITTED", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = textMutedColor)
+                        Text("${serviceState.pingsSent}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // CONFIGURATION CARD
+            BrutalCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = cardBg,
+                borderColor = borderColor
             ) {
                 Column {
-                    Text("DEVICE BATTERY", fontWeight = FontWeight.Black, fontSize = 11.sp, color = textColor)
-                    val batText = if (pkt != null) "${pkt.battery}%" + if (pkt.isCharging) " (⚡)" else "" else "--%"
-                    Text(batText, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
+                    Text(
+                        text = "CONFIGURATION // ENCRYPTION",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 14.sp,
+                        color = textColor
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    BrutalInputField(
+                        value = deviceName,
+                        onValueChange = { deviceName = it },
+                        label = "Device Name (e.g. Arka's Phone / Car / Bike)"
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    BrutalInputField(
+                        value = passphrase,
+                        onValueChange = { passphrase = it },
+                        label = "Master Passcode (Default: hackme-if-you-can)",
+                        isPassword = true
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    BrutalInputField(
+                        value = brokerHost,
+                        onValueChange = { brokerHost = it },
+                        label = "MQTT Broker Relay Host"
+                    )
                 }
-                Column(horizontalAlignment = Alignment.End) {
-                    Text("TOTAL PINGS", fontWeight = FontWeight.Black, fontSize = 11.sp, color = textColor)
-                    Text("${serviceState.pingsSent}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // PC SYNC LINK CARD
+            BrutalCard(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = cardBg,
+                borderColor = borderColor
+            ) {
+                Column {
+                    Text(
+                        text = "PC / WEB DASHBOARD SYNC",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 14.sp,
+                        color = textColor
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Open your web dashboard on PC or tablet. With your master passcode, your devices are automatically discovered and tracked on the live map.",
+                        fontSize = 12.sp,
+                        color = textMutedColor,
+                        lineHeight = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    BrutalButton(
+                        text = "SHARE PRIVATE DASHBOARD LINK",
+                        onClick = {
+                            val shareUrl = "https://opmanus.github.io/brutalloc-tracker/?pass=${passphrase}&autoconnect=1"
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, "Open Arka Track on PC: $shareUrl")
+                                type = "text/plain"
+                            }
+                            context.startActivity(Intent.createChooser(sendIntent, "Share Live Track Link"))
+                        },
+                        backgroundColor = cardBg,
+                        textColor = textColor,
+                        borderColor = borderColor,
+                        borderWidth = 1.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // CONFIGURATION CARD
-        BrutalCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = yellowCardBg,
-            borderColor = borderColor,
-            shadowOffset = 5.dp
-        ) {
-            Column {
-                Text(
-                    text = "SETTINGS // ENCRYPTION",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 16.sp,
-                    color = textColor
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                BrutalInputField(
-                    value = deviceName,
-                    onValueChange = { deviceName = it },
-                    label = "DEVICE NAME (E.G. ARKA'S PHONE / CAR / BIKE)"
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                BrutalInputField(
-                    value = passphrase,
-                    onValueChange = { passphrase = it },
-                    label = "MASTER ENCRYPTION KEY (E2EE)",
-                    isPassword = true
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                BrutalInputField(
-                    value = brokerHost,
-                    onValueChange = { brokerHost = it },
-                    label = "MQTT Broker Host"
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // PC SYNC LINK CARD
-        BrutalCard(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = cardBg,
-            borderColor = borderColor,
-            shadowOffset = 5.dp
-        ) {
-            Column {
-                Text(
-                    text = "DESKTOP / PC SYNC",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 16.sp,
-                    color = textColor
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Open your private web dashboard on PC or tablet. With your master passphrase, all your devices are auto-discovered and mapped simultaneously.",
-                    fontSize = 13.sp,
-                    color = textColor.copy(alpha = 0.85f)
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                BrutalButton(
-                    text = "SHARE PRIVATE DASHBOARD LINK",
-                    onClick = {
-                        val shareUrl = "https://opmanus.github.io/brutalloc-tracker/?pass=${passphrase}&autoconnect=1"
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, "Open BrutalTrack on PC: $shareUrl")
-                            type = "text/plain"
-                        }
-                        context.startActivity(Intent.createChooser(sendIntent, "Share Live Track Link"))
-                    },
-                    backgroundColor = BrutalYellow,
-                    textColor = BrutalBlack,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(80.dp))
     }
 }

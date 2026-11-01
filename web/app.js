@@ -13,6 +13,7 @@ const state = {
   map: null,
   tileLayer: null,
   currentTheme: "dark",
+  currentMapType: "osm", // "osm" or "satellite"
   audioEnabled: false,
   audioCtx: null,
   activeDeviceId: "all", // "all" or specific deviceId
@@ -41,6 +42,7 @@ const elements = {
   hudLastSeen: document.getElementById("hudLastSeen"),
   hudDeviceNameLabel: document.getElementById("hudDeviceNameLabel"),
   mapActiveDeviceTitle: document.getElementById("mapActiveDeviceTitle"),
+  layerToggleBtn: document.getElementById("layerToggleBtn"),
   brokerSelect: document.getElementById("brokerSelect"),
   customBrokerGroup: document.getElementById("customBrokerGroup"),
   customBrokerInput: document.getElementById("customBrokerInput"),
@@ -52,22 +54,22 @@ const elements = {
   packetLog: document.getElementById("packetLog")
 };
 
-// Map Tile Themes (Sophisticated & Subtle)
-const TILE_CONFIG = {
-  dark: {
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+// Map Tile Providers (100% Free, Zero API Keys, Superior India & Global Coverage)
+const TILE_PROVIDERS = {
+  osm: {
+    label: "MAP: STREET (OSM)",
+    url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
     options: {
-      subdomains: "abcd",
-      maxZoom: 20,
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
     }
   },
-  light: {
-    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  satellite: {
+    label: "MAP: SATELLITE (ESRI)",
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     options: {
-      subdomains: "abcd",
-      maxZoom: 20,
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+      maxZoom: 19,
+      attribution: 'Tiles &copy; <a href="https://www.esri.com/" target="_blank">Esri</a> &mdash; Source: Esri, Maxar, Earthstar Geographics'
     }
   }
 };
@@ -129,6 +131,37 @@ function lockTerminal() {
   elements.masterPassInput.value = "";
 }
 
+// Update Map Tile Layer with Free Providers & Tactical Theme Filters
+function updateMapTiles() {
+  if (!state.map) return;
+  if (state.tileLayer) {
+    state.map.removeLayer(state.tileLayer);
+  }
+
+  const provider = TILE_PROVIDERS[state.currentMapType] || TILE_PROVIDERS.osm;
+  state.tileLayer = L.tileLayer(provider.url, provider.options).addTo(state.map);
+
+  // Apply or remove dark mode inversion on tile pane
+  const tilePane = state.map.getPanes().tilePane;
+  if (tilePane) {
+    if (state.currentMapType === "osm" && state.currentTheme === "dark") {
+      tilePane.classList.add("tactical-dark");
+    } else {
+      tilePane.classList.remove("tactical-dark");
+    }
+  }
+
+  if (elements.layerToggleBtn) {
+    elements.layerToggleBtn.textContent = provider.label;
+  }
+}
+
+// Toggle between Free OpenStreetMap and High-Res Esri Satellite
+function toggleMapLayer() {
+  state.currentMapType = state.currentMapType === "osm" ? "satellite" : "osm";
+  updateMapTiles();
+}
+
 // Theme Switching
 function setTheme(theme) {
   state.currentTheme = theme;
@@ -139,11 +172,7 @@ function setTheme(theme) {
     elements.themeToggleBtn.textContent = theme === "dark" ? "THEME: DARK ☾" : "THEME: LIGHT ☼";
   }
 
-  if (state.map) {
-    if (state.tileLayer) state.map.removeLayer(state.tileLayer);
-    const conf = TILE_CONFIG[theme] || TILE_CONFIG.dark;
-    state.tileLayer = L.tileLayer(conf.url, conf.options).addTo(state.map);
-  }
+  updateMapTiles();
 }
 
 function initTheme() {
@@ -155,15 +184,14 @@ function initTheme() {
   }
 }
 
-// Initialize Leaflet Map
+// Initialize Leaflet Map (Centered over India by default)
 function initMap() {
   state.map = L.map("map", {
     zoomControl: true,
     attributionControl: true
-  }).setView([20.0, 0.0], 3);
+  }).setView([20.5937, 78.9629], 5);
 
-  const conf = TILE_CONFIG[state.currentTheme] || TILE_CONFIG.dark;
-  state.tileLayer = L.tileLayer(conf.url, conf.options).addTo(state.map);
+  updateMapTiles();
 }
 
 // Log message to raw packet drawer
@@ -534,6 +562,9 @@ function setupEvents() {
   });
 
   elements.lockTerminalBtn.addEventListener("click", lockTerminal);
+  if (elements.layerToggleBtn) {
+    elements.layerToggleBtn.addEventListener("click", toggleMapLayer);
+  }
   elements.recenterBtn.addEventListener("click", recenter);
   elements.clearTrailBtn.addEventListener("click", clearTrails);
   elements.exportGpxBtn.addEventListener("click", exportGPX);

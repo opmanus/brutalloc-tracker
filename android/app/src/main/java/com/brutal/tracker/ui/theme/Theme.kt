@@ -14,64 +14,95 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Refined Neo-Brutalist Palette (Balanced & High Contrast)
-val BrutalRed = Color(0xFFEF4444)
-val BrutalBlue = Color(0xFF38BDF8)
-val BrutalYellow = Color(0xFFF59E0B)
-val BrutalGreen = Color(0xFF10B981)
-val BrutalMagenta = Color(0xFFC026D3)
+// Subdued Tactical Palette (Fine Accents)
+val AccentCyan = Color(0xFF38BDF8)
+val AccentGreen = Color(0xFF34D399)
+val AccentRose = Color(0xFFFB7185)
+val AccentPurple = Color(0xFFC084FC)
+val AccentAmber = Color(0xFFFBBF24)
 
-val BrutalBlack = Color(0xFF000000)
+// Neutral Foundation
+val DarkBg = Color(0xFF090B10)
+val DarkCard = Color(0xFF131722)
+val DarkCardMuted = Color(0xFF181E2B)
+val DarkBorder = Color(0xFF222B3D)
+val DarkText = Color(0xFFE2E8F0)
+val DarkTextMuted = Color(0xFF8B9CB2)
+
+val LightBg = Color(0xFFF8FAFC)
+val LightCard = Color(0xFFFFFFFF)
+val LightCardMuted = Color(0xFFF1F5F9)
+val LightBorder = Color(0xFFCBD5E1)
+val LightText = Color(0xFF0F172A)
+val LightTextMuted = Color(0xFF64748B)
+
+// Subtle Tinted Surface Accents for Dark Mode
+val DarkCardCyan = Color(0xFF0C2333)
+val DarkCardGreen = Color(0xFF0D2820)
+val DarkCardRose = Color(0xFF291218)
+val DarkCardPurple = Color(0xFF221330)
+val DarkCardAmber = Color(0xFF261D10)
+
+// Subtle Tinted Surface Accents for Light Mode
+val LightCardCyan = Color(0xFFF0F9FF)
+val LightCardGreen = Color(0xFFF0FDF4)
+val LightCardRose = Color(0xFFFFF1F2)
+val LightCardPurple = Color(0xFFFAF5FF)
+val LightCardAmber = Color(0xFFFEFCE8)
+
+// Legacy aliases for safe builds
+val BrutalRed = AccentRose
+val BrutalBlue = AccentCyan
+val BrutalYellow = AccentAmber
+val BrutalGreen = AccentGreen
+val BrutalMagenta = AccentPurple
+val BrutalBlack = Color(0xFF090B10)
 val BrutalWhite = Color(0xFFFFFFFF)
-
-// Dark Theme Surfaces
-val BrutalDarkBg = Color(0xFF0D0F14)
-val BrutalDarkCard = Color(0xFF161920)
-val BrutalDarkCardYellow = Color(0xFF201D14)
-val BrutalDarkCardRed = Color(0xFF281416)
-val BrutalDarkCardMagenta = Color(0xFF27142B)
-val BrutalDarkCardGreen = Color(0xFF12261B)
-val BrutalDarkBorder = Color(0xFF3B4252)
-
-// Light Theme Surfaces
-val BrutalLightBg = Color(0xFFF4F4F0)
-val BrutalLightCard = Color(0xFFFFFFFF)
-val BrutalLightCardYellow = Color(0xFFFEF9C3)
-val BrutalLightCardRed = Color(0xFFFEE2E2)
-val BrutalLightCardMagenta = Color(0xFFFAE8FF)
-val BrutalLightCardGreen = Color(0xFFD1FAE5)
+val BrutalDarkBg = DarkBg
+val BrutalDarkCard = DarkCard
+val BrutalDarkCardYellow = DarkCardAmber
+val BrutalDarkCardRed = DarkCardRose
+val BrutalDarkCardMagenta = DarkCardPurple
+val BrutalDarkCardGreen = DarkCardGreen
+val BrutalDarkBorder = DarkBorder
+val BrutalLightBg = LightBg
+val BrutalLightCard = LightCard
+val BrutalLightCardYellow = LightCardAmber
+val BrutalLightCardRed = LightCardRose
+val BrutalLightCardMagenta = LightCardPurple
+val BrutalLightCardGreen = LightCardGreen
 
 val BrutalShapes = androidx.compose.material3.Shapes(
-    extraSmall = RoundedCornerShape(0.dp),
-    small = RoundedCornerShape(0.dp),
-    medium = RoundedCornerShape(0.dp),
-    large = RoundedCornerShape(0.dp),
-    extraLarge = RoundedCornerShape(0.dp)
+    extraSmall = RoundedCornerShape(4.dp),
+    small = RoundedCornerShape(6.dp),
+    medium = RoundedCornerShape(8.dp),
+    large = RoundedCornerShape(12.dp),
+    extraLarge = RoundedCornerShape(16.dp)
 )
 
 val BrutalTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Black,
-        fontSize = 38.sp,
-        lineHeight = 40.sp,
+        fontSize = 32.sp,
+        lineHeight = 36.sp,
         letterSpacing = (-0.5).sp
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Black,
-        fontSize = 22.sp,
+        fontSize = 20.sp,
         lineHeight = 24.sp
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
+        fontSize = 15.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Monospace,
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp
+        fontWeight = FontWeight.Medium,
+        fontSize = 13.sp
     ),
     labelSmall = TextStyle(
         fontFamily = FontFamily.Monospace,
@@ -81,27 +112,27 @@ val BrutalTypography = Typography(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = BrutalBlack,
-    onPrimary = BrutalWhite,
-    secondary = BrutalYellow,
-    onSecondary = BrutalBlack,
-    tertiary = BrutalRed,
-    background = BrutalLightBg,
-    onBackground = BrutalBlack,
-    surface = BrutalLightCard,
-    onSurface = BrutalBlack
+    primary = AccentCyan,
+    onPrimary = Color(0xFF0F172A),
+    secondary = AccentGreen,
+    onSecondary = Color(0xFF0F172A),
+    tertiary = AccentRose,
+    background = LightBg,
+    onBackground = LightText,
+    surface = LightCard,
+    onSurface = LightText
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = BrutalWhite,
-    onPrimary = BrutalBlack,
-    secondary = BrutalYellow,
-    onSecondary = BrutalBlack,
-    tertiary = BrutalRed,
-    background = BrutalDarkBg,
-    onBackground = BrutalWhite,
-    surface = BrutalDarkCard,
-    onSurface = BrutalWhite
+    primary = AccentCyan,
+    onPrimary = Color(0xFF090B10),
+    secondary = AccentGreen,
+    onSecondary = Color(0xFF090B10),
+    tertiary = AccentRose,
+    background = DarkBg,
+    onBackground = DarkText,
+    surface = DarkCard,
+    onSurface = DarkText
 )
 
 @Composable
