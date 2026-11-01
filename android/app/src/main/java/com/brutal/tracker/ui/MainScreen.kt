@@ -366,50 +366,6 @@ fun MainScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // PC SYNC LINK CARD
-            BrutalCard(
-                modifier = Modifier.fillMaxWidth(),
-                backgroundColor = cardBg,
-                borderColor = borderColor
-            ) {
-                Column {
-                    Text(
-                        text = "PC / WEB DASHBOARD SYNC",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 14.sp,
-                        color = textColor
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        text = "Open your web dashboard on PC or tablet. With your master passcode, your devices are automatically discovered and tracked on the live map.",
-                        fontSize = 12.sp,
-                        color = textMutedColor,
-                        lineHeight = 16.sp
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    BrutalButton(
-                        text = "SHARE PRIVATE DASHBOARD LINK",
-                        onClick = {
-                            val shareUrl = "https://opmanus.github.io/brutalloc-tracker/?pass=${passphrase}&autoconnect=1"
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, "Open Arka Track on PC: $shareUrl")
-                                type = "text/plain"
-                            }
-                            context.startActivity(Intent.createChooser(sendIntent, "Share Live Track Link"))
-                        },
-                        backgroundColor = cardBg,
-                        textColor = textColor,
-                        borderColor = borderColor,
-                        borderWidth = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }

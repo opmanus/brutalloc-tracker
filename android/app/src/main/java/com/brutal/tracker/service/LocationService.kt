@@ -34,8 +34,10 @@ import com.google.android.gms.location.Priority
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -50,6 +52,7 @@ class LocationService : Service() {
     private lateinit var locationCallback: LocationCallback
     private var mqttPublisher: MqttPublisher? = null
     private var wakeLock: PowerManager.WakeLock? = null
+    private var periodicJob: Job? = null
 
     private var deviceName: String = "Arka's Phone"
     private var channelId: String = "alpha-squad-01"
@@ -183,13 +186,33 @@ class LocationService : Service() {
         )
 
         serviceScope.launch {
-            mqttPublisher = MqttPublisher(brokerHost, brokerPort, channelId)
+            mqttPublisher = MqttPublisher(brokerHost, brokerPort, channelId, deviceId)
             val connected = mqttPublisher?.connect() ?: false
             if (connected) {
                 _serviceState.value = _serviceState.value.copy(statusMessage = "BROADCASTING // E2EE ONLINE")
+                // Immediately send cached location once connected to relay
+                try {
+                    fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
+                        if (loc != null) processLocation(loc)
+                    }
+                } catch (e: SecurityException) {
+                    Log.e(tag, "Permission error", e)
+                }
             } else {
                 _serviceState.value = _serviceState.value.copy(statusMessage = "RELAY OFFLINE (RETRYING)")
             }
+        }
+
+        // Fetch immediate location fix so dashboard doesn't wait
+        try {
+            fusedLocationClient.lastLocation.addOnSuccessListener { loc ->
+                if (loc != null) processLocation(loc)
+            }
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { loc ->
+                if (loc != null) processLocation(loc)
+            }
+        } catch (e: SecurityException) {
+            Log.e(tag, "Location permission missing", e)
         }
 
         val locationRequest = LocationRequest.Builder(
@@ -209,6 +232,21 @@ class LocationService : Service() {
         } catch (e: SecurityException) {
             Log.e(tag, "Location permission missing", e)
             _serviceState.value = _serviceState.value.copy(statusMessage = "ERROR: PERMISSION DENIED")
+        }
+
+        // Periodic Fallback Loop (ensures fresh telemetry even when stationary or indoors)
+        periodicJob?.cancel()
+        periodicJob = serviceScope.launch {
+            while (true) {
+                delay((intervalSec * 1000).toLong())
+                try {
+                    fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener { loc ->
+                        if (loc != null) processLocation(loc)
+                    }
+                } catch (e: Exception) {
+                    Log.e(tag, "Periodic location update error", e)
+                }
+            }
         }
     }
 
@@ -276,6 +314,8 @@ class LocationService : Service() {
     }
 
     private fun stopTracking() {
+        periodicJob?.cancel()
+        periodicJob = null
         try {
             fusedLocationClient.removeLocationUpdates(locationCallback)
             if (wakeLock?.isHeld == true) {

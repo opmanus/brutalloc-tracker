@@ -11,11 +11,13 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 class MqttPublisher(
     private val host: String,
     private val port: Int,
-    private val channelId: String
+    private val channelId: String,
+    private val deviceId: String = "DEV"
 ) {
     private val tag = "MqttPublisher"
     private var client: MqttClient? = null
-    private val topic = "brutalloc/$channelId"
+    private val baseTopic = "brutalloc/$channelId"
+    private val deviceTopic = "brutalloc/$channelId/$deviceId"
 
     suspend fun connect(): Boolean = withContext(Dispatchers.IO) {
         try {
@@ -30,7 +32,7 @@ class MqttPublisher(
                 isAutomaticReconnect = true
             }
 
-            Log.d(tag, "Connecting to MQTT broker: $serverUri on topic: $topic")
+            Log.d(tag, "Connecting to MQTT broker: $serverUri on topic: $deviceTopic")
             client?.connect(options)
             Log.d(tag, "Connected successfully to $serverUri")
             true
@@ -47,12 +49,16 @@ class MqttPublisher(
                 connect()
             }
 
+            // Retained message with QoS 1 ensures MQTT broker keeps latest location on server
+            // so the web dashboard receives the phone immediately upon loading!
             val message = MqttMessage(payloadJson.toByteArray(Charsets.UTF_8)).apply {
-                qos = 0
-                isRetained = false
+                qos = 1
+                isRetained = true
             }
-            client?.publish(topic, message)
-            Log.d(tag, "Published encrypted packet to topic $topic (${payloadJson.length} bytes)")
+
+            client?.publish(deviceTopic, message)
+            client?.publish(baseTopic, message)
+            Log.d(tag, "Published retained packet to $deviceTopic and $baseTopic (${payloadJson.length} bytes)")
             true
         } catch (e: Exception) {
             Log.e(tag, "Failed to publish packet", e)

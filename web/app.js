@@ -243,7 +243,8 @@ function connectRelay() {
   logMessage(`Connecting to WSS Broker for Channel [${state.derivedChannel}]...`);
 
   const clientId = "arka_dash_" + Math.random().toString(16).substring(2, 10);
-  const topic = `brutalloc/${state.derivedChannel}`;
+  const baseTopic = `brutalloc/${state.derivedChannel}`;
+  const wildcardTopic = `brutalloc/${state.derivedChannel}/#`;
 
   try {
     state.client = mqtt.connect(brokerUrl, {
@@ -263,11 +264,11 @@ function connectRelay() {
     updateStatus("live", "STREAM ACTIVE");
     logMessage(`BROKER CONNECTED. Listening to private stream.`);
 
-    state.client.subscribe(topic, { qos: 0 }, (err) => {
+    state.client.subscribe([baseTopic, wildcardTopic], { qos: 1 }, (err) => {
       if (err) {
         logMessage(`Subscription error: ${err.message}`, true);
       } else {
-        logMessage(`READY: Listening for your devices...`);
+        logMessage(`READY: Subscribed to [${baseTopic}] and [${wildcardTopic}]`);
       }
     });
   });
