@@ -55,4 +55,4 @@ if [ ! -f "$WRAPPER_JAR" ]; then
     curl -sLo "$WRAPPER_JAR" https://raw.githubusercontent.com/gradle/gradle/v8.7.0/gradle/wrapper/gradle-wrapper.jar || true
 fi
 
-exec "$JAVACMD" "-Dorg.gradle.appname=$APP_BASE_NAME" -jar "$WRAPPER_JAR" "$@"
+exec "$JAVACMD" "-Dorg.gradle.appname=$APP_BASE_NAME" -cp "$WRAPPER_JAR" org.gradle.wrapper.GradleWrapperMain "$@"
