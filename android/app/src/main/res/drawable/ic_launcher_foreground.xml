@@ -1,17 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    
+    <!-- Outer Radar Pulse Ring -->
     <path
-        android:fillColor="#FFFF00"
-        android:pathData="M0,0h108v108h-108z" />
+        android:strokeColor="#1E293B"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.8"
+        android:pathData="M54,54m-26,0a26,26 0,1,1 52,0a26,26 0,1,1 -52,0" />
+
+    <!-- Inner Radar Orbital Ring -->
     <path
-        android:fillColor="#000000"
-        android:strokeColor="#000000"
-        android:strokeWidth="4"
-        android:pathData="M24,24h60v60h-60z" />
+        android:strokeColor="#38BDF8"
+        android:strokeWidth="1.5"
+        android:strokeAlpha="0.35"
+        android:pathData="M54,54m-17,0a17,17 0,1,1 34,0a17,17 0,1,1 -34,0" />
+
+    <!-- Cardinal Crosshair Ticks -->
     <path
-        android:fillColor="#FF0000"
-        android:pathData="M40,40h28v28h-28z" />
+        android:strokeColor="#38BDF8"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M54,23 L54,29 M54,79 L54,85 M23,54 L29,54 M79,54 L85,54" />
+
+    <!-- Minimal Sleek Telemetry Arrowhead -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M54,41 L64,63 L54,58 L44,63 Z" />
+
+    <!-- Arrowhead Subtle Inner Highlight -->
+    <path
+        android:fillColor="#F8FAFC"
+        android:fillAlpha="0.9"
+        android:pathData="M54,41 L59,52 L54,50 L49,52 Z" />
+
+    <!-- Live Telemetry Pulse Dot -->
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M54,58m-2.5,0a2.5,2.5 0,1,1 5,0a2.5,2.5 0,1,1 -5,0" />
+
 </vector>

@@ -1,9 +1,9 @@
 package com.brutal.tracker.ui
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,14 +22,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +41,6 @@ import com.brutal.tracker.service.LocationService
 import com.brutal.tracker.ui.components.BrutalButton
 import com.brutal.tracker.ui.components.BrutalCard
 import com.brutal.tracker.ui.components.BrutalPill
-import com.brutal.tracker.ui.theme.AccentAmber
 import com.brutal.tracker.ui.theme.AccentCyan
 import com.brutal.tracker.ui.theme.AccentGreen
 import com.brutal.tracker.ui.theme.AccentPurple
@@ -48,21 +48,15 @@ import com.brutal.tracker.ui.theme.AccentRose
 import com.brutal.tracker.ui.theme.DarkBg
 import com.brutal.tracker.ui.theme.DarkBorder
 import com.brutal.tracker.ui.theme.DarkCard
-import com.brutal.tracker.ui.theme.DarkCardCyan
-import com.brutal.tracker.ui.theme.DarkCardGreen
-import com.brutal.tracker.ui.theme.DarkCardPurple
-import com.brutal.tracker.ui.theme.DarkCardRose
 import com.brutal.tracker.ui.theme.DarkText
 import com.brutal.tracker.ui.theme.DarkTextMuted
 import com.brutal.tracker.ui.theme.LightBg
 import com.brutal.tracker.ui.theme.LightBorder
 import com.brutal.tracker.ui.theme.LightCard
-import com.brutal.tracker.ui.theme.LightCardCyan
-import com.brutal.tracker.ui.theme.LightCardGreen
-import com.brutal.tracker.ui.theme.LightCardPurple
-import com.brutal.tracker.ui.theme.LightCardRose
 import com.brutal.tracker.ui.theme.LightText
 import com.brutal.tracker.ui.theme.LightTextMuted
+import com.brutal.tracker.update.UpdateChecker
+import com.brutal.tracker.update.UpdateInfo
 
 @Composable
 fun MainScreen(
@@ -79,17 +73,20 @@ fun MainScreen(
     val borderColor = if (isDark) DarkBorder else LightBorder
     val cardBg = if (isDark) DarkCard else LightCard
 
-    val cardCyanBg = if (isDark) DarkCardCyan else LightCardCyan
-    val cardRoseBg = if (isDark) DarkCardRose else LightCardRose
-    val cardPurpleBg = if (isDark) DarkCardPurple else LightCardPurple
-    val cardGreenBg = if (isDark) DarkCardGreen else LightCardGreen
-
-    var deviceName by remember { mutableStateOf("Arka's Phone") }
-    var passphrase by remember { mutableStateOf("hackme-if-you-can") }
-    var brokerHost by remember { mutableStateOf("broker.hivemq.com") }
-    var updateIntervalSec by remember { mutableIntStateOf(3) }
+    val deviceName = "Arka's Phone"
+    val passphrase = "hackme-if-you-can"
+    val brokerHost = "broker.hivemq.com"
+    val updateIntervalSec = 3
 
     val scrollState = rememberScrollState()
+
+    // Auto-update checker state
+    var updateInfo by remember { mutableStateOf<UpdateInfo?>(null) }
+    var isDownloadingUpdate by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        updateInfo = UpdateChecker.checkForUpdates("1.1.0")
+    }
 
     Scaffold(
         containerColor = screenBg,
@@ -102,43 +99,95 @@ fun MainScreen(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // Header Bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(cardBg, RoundedCornerShape(8.dp))
-                    .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                    .padding(16.dp)
-            ) {
-                Column {
+            // Auto Update Alert Banner if a newer version is available
+            updateInfo?.let { update ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(AccentCyan.copy(alpha = 0.12f))
+                        .border(1.dp, AccentCyan, RoundedCornerShape(12.dp))
+                        .clickable {
+                            if (!isDownloadingUpdate) {
+                                isDownloadingUpdate = true
+                                UpdateChecker.startDownloadAndInstall(context, update.downloadUrl, update.version)
+                            }
+                        }
+                        .padding(14.dp)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "ARKA//TRACK",
-                                color = textColor,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Black,
-                                letterSpacing = (-0.5).sp
+                                text = "✨ UPDATE AVAILABLE (${update.version})",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = AccentCyan
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "AES-256-GCM E2EE TELEMETRY",
-                                color = AccentCyan,
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 11.sp
+                                text = if (isDownloadingUpdate) "Downloading APK & launching installer..." else "Tap here to auto-update and install",
+                                fontSize = 11.sp,
+                                color = textColor.copy(alpha = 0.8f)
                             )
                         }
+                        BrutalPill(
+                            text = if (isDownloadingUpdate) "UPDATING" else "INSTALL",
+                            backgroundColor = AccentCyan
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
-                        if (serviceState.isTracking) {
-                            BrutalPill("LIVE", AccentGreen)
-                        } else {
-                            BrutalPill("STANDBY", AccentRose)
+            // Top Header Bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(cardBg, RoundedCornerShape(14.dp))
+                    .border(1.dp, borderColor, RoundedCornerShape(14.dp))
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "ARKA//TRACK",
+                                color = textColor,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = (-0.5).sp
+                            )
+                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                            Text(
+                                text = "v1.1.0",
+                                color = textMutedColor,
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "AES-256-GCM TELEMETRY",
+                            color = AccentCyan,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.sp,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+
+                    if (serviceState.isTracking) {
+                        BrutalPill("LIVE", AccentGreen)
+                    } else {
+                        BrutalPill("STANDBY", textMutedColor)
                     }
                 }
             }
@@ -151,16 +200,16 @@ fun MainScreen(
                     text = "⚡ START BROADCAST",
                     onClick = {
                         val config = TrackerConfig(
-                            deviceName = deviceName.trim(),
-                            passphrase = passphrase.trim(),
-                            brokerHost = brokerHost.trim(),
+                            deviceName = deviceName,
+                            passphrase = passphrase,
+                            brokerHost = brokerHost,
                             brokerPort = 1883,
                             updateIntervalSec = updateIntervalSec
                         )
                         onStartService(config)
                     },
                     backgroundColor = AccentCyan,
-                    textColor = DarkBg,
+                    textColor = Color(0xFF090D16),
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
@@ -168,7 +217,7 @@ fun MainScreen(
                     text = "⛔ TERMINATE BROADCAST",
                     onClick = onStopService,
                     backgroundColor = AccentRose,
-                    textColor = DarkBg,
+                    textColor = Color(0xFFFFFFFF),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -179,15 +228,15 @@ fun MainScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(cardBg, RoundedCornerShape(6.dp))
-                    .border(1.dp, borderColor, RoundedCornerShape(6.dp))
-                    .padding(horizontal = 12.dp, vertical = 10.dp)
+                    .background(cardBg, RoundedCornerShape(10.dp))
+                    .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
                 Text(
                     text = "> " + serviceState.statusMessage,
                     color = if (serviceState.isTracking) AccentGreen else textMutedColor,
                     fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     fontSize = 12.sp
                 )
             }
@@ -196,26 +245,26 @@ fun MainScreen(
 
             // Section Label
             Text(
-                text = "LIVE TELEMETRY HUD",
-                fontWeight = FontWeight.Black,
-                fontSize = 15.sp,
-                color = textColor,
-                letterSpacing = (-0.2).sp
+                text = "TELEMETRY RADAR",
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp,
+                color = textMutedColor,
+                letterSpacing = 0.5.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             val pkt = serviceState.lastPacket
 
-            // Row 1: Coordinates Card
+            // Row 1: Coordinates Card (Cyan Accent)
             BrutalCard(
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = cardCyanBg,
-                borderColor = borderColor
+                backgroundColor = cardBg,
+                borderColor = borderColor,
+                topAccentColor = AccentCyan
             ) {
                 Column {
                     Text(
                         text = "COORDINATES (WGS84)",
-                        fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.Bold,
                         fontSize = 11.sp,
                         color = textMutedColor
@@ -248,11 +297,12 @@ fun MainScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Speed Card
+                // Speed Card (Rose Accent)
                 BrutalCard(
                     modifier = Modifier.weight(1f),
-                    backgroundColor = cardRoseBg,
-                    borderColor = borderColor
+                    backgroundColor = cardBg,
+                    borderColor = borderColor,
+                    topAccentColor = AccentRose
                 ) {
                     Column {
                         Text(
@@ -273,11 +323,12 @@ fun MainScreen(
                     }
                 }
 
-                // Accuracy Card
+                // Accuracy Card (Purple Accent)
                 BrutalCard(
                     modifier = Modifier.weight(1f),
-                    backgroundColor = cardPurpleBg,
-                    borderColor = borderColor
+                    backgroundColor = cardBg,
+                    borderColor = borderColor,
+                    topAccentColor = AccentPurple
                 ) {
                     Column {
                         Text(
@@ -301,15 +352,17 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Device Telemetry Card
+            // Device Telemetry Card (Emerald Accent)
             BrutalCard(
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = cardGreenBg,
-                borderColor = borderColor
+                backgroundColor = cardBg,
+                borderColor = borderColor,
+                topAccentColor = AccentGreen
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
                         Text("BATTERY", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = textMutedColor)

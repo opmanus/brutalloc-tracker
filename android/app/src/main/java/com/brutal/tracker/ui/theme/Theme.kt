@@ -14,89 +14,87 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Subdued Tactical Palette (Fine Accents)
+// Modern Tactical Accents
 val AccentCyan = Color(0xFF38BDF8)
 val AccentGreen = Color(0xFF34D399)
 val AccentRose = Color(0xFFFB7185)
 val AccentPurple = Color(0xFFC084FC)
 val AccentAmber = Color(0xFFFBBF24)
 
-// Neutral Foundation
-val DarkBg = Color(0xFF090B10)
-val DarkCard = Color(0xFF131722)
-val DarkCardMuted = Color(0xFF181E2B)
-val DarkBorder = Color(0xFF222B3D)
-val DarkText = Color(0xFFE2E8F0)
-val DarkTextMuted = Color(0xFF8B9CB2)
+// Dark Theme Foundations (Unified & Elegant)
+val DarkBg = Color(0xFF090D16)
+val DarkCard = Color(0xFF111827)
+val DarkBorder = Color(0xFF1E293B)
+val DarkText = Color(0xFFF8FAFC)
+val DarkTextMuted = Color(0xFF8492A6)
 
-val LightBg = Color(0xFFF8FAFC)
+// Light Theme Foundations
+val LightBg = Color(0xFFF1F5F9)
 val LightCard = Color(0xFFFFFFFF)
-val LightCardMuted = Color(0xFFF1F5F9)
-val LightBorder = Color(0xFFCBD5E1)
+val LightBorder = Color(0xFFE2E8F0)
 val LightText = Color(0xFF0F172A)
 val LightTextMuted = Color(0xFF64748B)
 
-// Subtle Tinted Surface Accents for Dark Mode
-val DarkCardCyan = Color(0xFF0C2333)
-val DarkCardGreen = Color(0xFF0D2820)
-val DarkCardRose = Color(0xFF291218)
-val DarkCardPurple = Color(0xFF221330)
-val DarkCardAmber = Color(0xFF261D10)
+// Card Surface Accents
+val DarkCardCyan = DarkCard
+val DarkCardGreen = DarkCard
+val DarkCardRose = DarkCard
+val DarkCardPurple = DarkCard
+val DarkCardAmber = DarkCard
 
-// Subtle Tinted Surface Accents for Light Mode
-val LightCardCyan = Color(0xFFF0F9FF)
-val LightCardGreen = Color(0xFFF0FDF4)
-val LightCardRose = Color(0xFFFFF1F2)
-val LightCardPurple = Color(0xFFFAF5FF)
-val LightCardAmber = Color(0xFFFEFCE8)
+val LightCardCyan = LightCard
+val LightCardGreen = LightCard
+val LightCardRose = LightCard
+val LightCardPurple = LightCard
+val LightCardAmber = LightCard
 
-// Legacy aliases for safe builds
+// Legacy aliases for backward compatibility
 val BrutalRed = AccentRose
 val BrutalBlue = AccentCyan
 val BrutalYellow = AccentAmber
 val BrutalGreen = AccentGreen
 val BrutalMagenta = AccentPurple
-val BrutalBlack = Color(0xFF090B10)
+val BrutalBlack = DarkBg
 val BrutalWhite = Color(0xFFFFFFFF)
 val BrutalDarkBg = DarkBg
 val BrutalDarkCard = DarkCard
-val BrutalDarkCardYellow = DarkCardAmber
-val BrutalDarkCardRed = DarkCardRose
-val BrutalDarkCardMagenta = DarkCardPurple
-val BrutalDarkCardGreen = DarkCardGreen
+val BrutalDarkCardYellow = DarkCard
+val BrutalDarkCardRed = DarkCard
+val BrutalDarkCardMagenta = DarkCard
+val BrutalDarkCardGreen = DarkCard
 val BrutalDarkBorder = DarkBorder
 val BrutalLightBg = LightBg
 val BrutalLightCard = LightCard
-val BrutalLightCardYellow = LightCardAmber
-val BrutalLightCardRed = LightCardRose
-val BrutalLightCardMagenta = LightCardPurple
-val BrutalLightCardGreen = LightCardGreen
+val BrutalLightCardYellow = LightCard
+val BrutalLightCardRed = LightCard
+val BrutalLightCardMagenta = LightCard
+val BrutalLightCardGreen = LightCard
 
 val BrutalShapes = androidx.compose.material3.Shapes(
     extraSmall = RoundedCornerShape(4.dp),
-    small = RoundedCornerShape(6.dp),
-    medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(12.dp),
-    extraLarge = RoundedCornerShape(16.dp)
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(12.dp),
+    large = RoundedCornerShape(16.dp),
+    extraLarge = RoundedCornerShape(20.dp)
 )
 
 val BrutalTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Black,
-        fontSize = 32.sp,
-        lineHeight = 36.sp,
+        fontSize = 30.sp,
+        lineHeight = 34.sp,
         letterSpacing = (-0.5).sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Black,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         lineHeight = 24.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 15.sp
     ),
     bodyMedium = TextStyle(
@@ -105,7 +103,7 @@ val BrutalTypography = Typography(
         fontSize = 13.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = FontFamily.Monospace,
+        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
         fontSize = 11.sp
     )
@@ -113,9 +111,9 @@ val BrutalTypography = Typography(
 
 private val LightColorScheme = lightColorScheme(
     primary = AccentCyan,
-    onPrimary = Color(0xFF0F172A),
+    onPrimary = Color(0xFFFFFFFF),
     secondary = AccentGreen,
-    onSecondary = Color(0xFF0F172A),
+    onSecondary = Color(0xFFFFFFFF),
     tertiary = AccentRose,
     background = LightBg,
     onBackground = LightText,
@@ -125,9 +123,9 @@ private val LightColorScheme = lightColorScheme(
 
 private val DarkColorScheme = darkColorScheme(
     primary = AccentCyan,
-    onPrimary = Color(0xFF090B10),
+    onPrimary = Color(0xFF090D16),
     secondary = AccentGreen,
-    onSecondary = Color(0xFF090B10),
+    onSecondary = Color(0xFF090D16),
     tertiary = AccentRose,
     background = DarkBg,
     onBackground = DarkText,

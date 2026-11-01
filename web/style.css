@@ -1,53 +1,45 @@
 /* avoid-ai-design-ignore-file: C2, SD2, SD4, SD8 */
 :root {
-  --bg-main: #f8fafc;
+  --bg-main: #f1f5f9;
   --bg-card: #ffffff;
   --bg-header: #ffffff;
   --text-header: #0f172a;
   --text-main: #0f172a;
   --text-muted: #64748b;
-  --border-color: #cbd5e1;
-  --shadow-color: rgba(15, 23, 42, 0.08);
+  --border-color: #e2e8f0;
+  --shadow-color: rgba(15, 23, 42, 0.05);
 
   --accent-cyan: #0284c7;
-  --accent-cyan-bg: #f0f9ff;
   --accent-red: #e11d48;
-  --accent-red-bg: #fff1f2;
   --accent-green: #059669;
-  --accent-green-bg: #ecfdf5;
   --accent-purple: #7c3aed;
-  --accent-purple-bg: #f5f3ff;
   --accent-amber: #d97706;
 
-  --input-bg: #f1f5f9;
+  --input-bg: #f8fafc;
   --input-text: #0f172a;
   --log-bg: #0f172a;
   --log-text: #34d399;
 }
 
 [data-theme="dark"] {
-  --bg-main: #090b10;
-  --bg-card: #131720;
-  --bg-header: #131720;
+  --bg-main: #090d16;
+  --bg-card: #111827;
+  --bg-header: #111827;
   --text-header: #f8fafc;
   --text-main: #f1f5f9;
-  --text-muted: #94a3b8;
-  --border-color: #242c3d;
-  --shadow-color: rgba(0, 0, 0, 0.5);
+  --text-muted: #8492a6;
+  --border-color: #1e293b;
+  --shadow-color: rgba(0, 0, 0, 0.4);
 
   --accent-cyan: #38bdf8;
-  --accent-cyan-bg: #0c1c28;
   --accent-red: #fb7185;
-  --accent-red-bg: #261118;
   --accent-green: #34d399;
-  --accent-green-bg: #0f241a;
   --accent-purple: #c084fc;
-  --accent-purple-bg: #1d122b;
   --accent-amber: #fbbf24;
 
-  --input-bg: #0b0d13;
+  --input-bg: #0c101a;
   --input-text: #f8fafc;
-  --log-bg: #07080c;
+  --log-bg: #07090f;
   --log-text: #34d399;
 }
 
@@ -56,7 +48,7 @@
 }
 
 *:focus-visible {
-  outline: 3px solid var(--accent-cyan) !important;
+  outline: 2px solid var(--accent-cyan) !important;
   outline-offset: 2px !important;
 }
 
@@ -67,13 +59,14 @@ body {
   color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   min-height: 100vh;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 /* Gatekeeper Overlay Modal */
 .gatekeeper-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 7, 10, 0.95);
+  background: rgba(5, 8, 14, 0.98);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -86,9 +79,10 @@ body {
   width: 100%;
   text-align: center;
   padding: 2.5rem 2rem;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   background: var(--bg-card);
-  box-shadow: 0 20px 40px var(--shadow-color);
+  border-radius: 8px;
+  box-shadow: 0 16px 32px var(--shadow-color);
 }
 
 .lock-icon {
@@ -104,7 +98,8 @@ body {
 
 /* Header */
 .brutal-header {
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   background: var(--bg-header);
   color: var(--text-header);
   padding: 1.25rem 1.75rem;
@@ -114,15 +109,12 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
   font-weight: 900;
-  text-transform: uppercase;
-  line-height: 1;
   letter-spacing: -0.025em;
   color: var(--text-header);
 }
@@ -130,7 +122,6 @@ h1 {
 h2, h3 {
   margin: 0 0 0.5rem 0;
   font-weight: 800;
-  text-transform: uppercase;
   letter-spacing: -0.02em;
 }
 
@@ -138,6 +129,7 @@ h2, h3 {
   font-size: 0.85rem;
   margin-top: 0.4rem;
   color: var(--accent-cyan);
+  font-weight: 600;
 }
 
 .header-actions {
@@ -148,104 +140,117 @@ h2, h3 {
 }
 
 .mono {
-  font-family: "Courier New", Courier, monospace;
+  font-family: "JetBrains Mono", "SF Mono", Consolas, "Courier New", monospace;
 }
 
 /* Status Pill */
 .status-pill {
-  display: inline-block;
-  padding: 0.4rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
   border: 1px solid var(--border-color);
+  font-size: 0.75rem;
   font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  font-size: 0.8rem;
-  font-family: "Courier New", Courier, monospace;
-}
-
-.status-pill.disconnected {
-  background: var(--accent-red-bg);
-  color: var(--accent-red);
-  border-color: var(--accent-red);
-}
-
-.status-pill.connecting {
-  background: #332711;
-  color: var(--accent-amber);
-  border-color: var(--accent-amber);
 }
 
 .status-pill.live {
-  background: var(--accent-green-bg);
-  color: var(--accent-green);
   border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: rgba(16, 185, 129, 0.1);
 }
 
-/* Device Bar */
-.device-bar-card {
-  padding: 1rem 1.5rem;
-  border: 2px solid var(--border-color);
+.status-pill.connecting {
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.status-pill.disconnected {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Multi-Device Selector Bar */
+.fleet-manager-bar {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   background: var(--bg-card);
+  padding: 0.85rem 1.25rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 12px var(--shadow-color);
-}
-
-.device-bar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.device-bar-title {
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-
-.device-count-badge {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--accent-green);
-}
-
-.device-tabs {
+.fleet-title-group {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
+}
+
+.device-badge-count {
+  background: var(--accent-cyan);
+  color: #090d16;
+  padding: 0.2rem 0.6rem;
+  font-weight: 900;
+  font-size: 0.75rem;
+  border-radius: 12px;
+}
+
+.device-tab-list {
+  display: flex;
+  gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  padding-bottom: 2px;
+  max-width: 100%;
 }
 
 .device-tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1rem;
-  background: var(--input-bg);
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
-  font-family: "Courier New", Courier, monospace;
-  font-size: 0.85rem;
+  background: var(--input-bg);
+  color: var(--text-muted);
   font-weight: 700;
+  font-size: 0.8rem;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.device-tab:hover {
+  border-color: var(--accent-cyan);
+  color: var(--text-main);
 }
 
 .device-tab.active {
-  background: var(--bg-main);
-  border: 2px solid var(--accent-cyan);
+  background: var(--bg-card);
+  border: 1px solid var(--accent-cyan);
   color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
 }
 
 .dot {
   width: 8px;
   height: 8px;
+  border-radius: 50%;
   display: inline-block;
   background: var(--text-muted);
 }
 
 .dot.live {
   background: var(--accent-green);
+  box-shadow: 0 0 6px var(--accent-green);
 }
 
 /* Layout Grids */
@@ -277,33 +282,55 @@ h2, h3 {
   }
 }
 
-/* Subtle Cards */
+/* Unified Subtle Cards */
 .card {
   padding: 1.5rem;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   background: var(--bg-card);
   color: var(--text-main);
-  box-shadow: 0 4px 12px var(--shadow-color);
+  position: relative;
+  overflow: hidden;
 }
 
-.card--telemetry {
-  background: var(--accent-cyan-bg);
-  border-color: var(--accent-cyan);
+.card--telemetry::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-cyan);
 }
 
-.card--speed {
-  background: var(--accent-red-bg);
-  border-color: var(--accent-red);
+.card--speed::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-red);
 }
 
-.card--altitude {
-  background: var(--accent-purple-bg);
-  border-color: var(--accent-purple);
+.card--altitude::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-purple);
 }
 
-.card--device {
-  background: var(--accent-green-bg);
-  border-color: var(--accent-green);
+.card--device::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-green);
 }
 
 /* Form Controls */
@@ -315,8 +342,8 @@ h2, h3 {
   display: block;
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 0.35rem;
-  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
   letter-spacing: 0.05em;
   color: var(--text-muted);
 }
@@ -325,17 +352,19 @@ h2, h3 {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
+  border-radius: 8px;
   background: var(--input-bg);
   color: var(--input-text);
-  font-family: "Courier New", Courier, monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
   outline: none;
+  transition: border-color 0.15s ease;
 }
 
 .input:focus {
   border-color: var(--accent-cyan);
-  outline: 2px solid var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
 }
 
 /* Buttons */
@@ -344,14 +373,21 @@ h2, h3 {
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  padding: 0.65rem 1.4rem;
+  padding: 0.65rem 1.25rem;
   border: 1px solid var(--border-color);
+  border-radius: 8px;
   background: var(--bg-card);
   color: var(--text-main);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+
+.button:hover {
+  background: var(--input-bg);
+  border-color: var(--accent-cyan);
 }
 
 .button:active {
@@ -360,9 +396,13 @@ h2, h3 {
 
 .button--primary {
   background: var(--accent-cyan);
-  color: #000000;
+  color: #090d16;
   border-color: var(--accent-cyan);
   font-weight: 800;
+}
+
+.button--primary:hover {
+  filter: brightness(1.1);
 }
 
 .button--ghost {
@@ -378,8 +418,8 @@ h2, h3 {
 
 /* HUD Numbers */
 .hud-value {
-  font-family: "Courier New", Courier, monospace;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
   font-weight: 900;
   line-height: 1.1;
   margin: 0.4rem 0;
@@ -403,7 +443,8 @@ h2, h3 {
 /* Speed Bar */
 .speed-bar-container {
   width: 100%;
-  height: 8px;
+  height: 6px;
+  border-radius: 3px;
   background: rgba(0, 0, 0, 0.2);
   margin-top: 0.6rem;
   overflow: hidden;
@@ -413,21 +454,23 @@ h2, h3 {
   height: 100%;
   width: 0%;
   background: var(--accent-red);
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 /* Map Section */
 .map-container-card {
   padding: 0;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
   background: var(--bg-card);
   margin-bottom: 1.5rem;
   overflow: hidden;
-  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .map-toolbar {
   background: var(--bg-card);
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   padding: 0.75rem 1.25rem;
   display: flex;
   justify-content: space-between;
@@ -438,9 +481,10 @@ h2, h3 {
 
 .toolbar-device-title {
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  font-family: "Courier New", Courier, monospace;
+  font-family: inherit;
+  color: var(--text-main);
 }
 
 #map {
@@ -460,19 +504,26 @@ h2, h3 {
 
 /* Leaflet Controls & Attribution */
 .leaflet-container {
-  font-family: "Courier New", Courier, monospace !important;
+  font-family: inherit !important;
+}
+
+.leaflet-control-zoom {
+  border-radius: 8px !important;
+  overflow: hidden;
+  border: 1px solid var(--border-color) !important;
 }
 
 .leaflet-control-zoom a {
   background: var(--bg-card) !important;
   color: var(--text-main) !important;
-  border: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
 }
 
 .leaflet-control-attribution {
   background: var(--bg-card) !important;
   color: var(--text-muted) !important;
   font-size: 0.7rem !important;
+  border-top-left-radius: 6px;
   border: 1px solid var(--border-color) !important;
 }
 
@@ -483,10 +534,9 @@ h2, h3 {
 .leaflet-popup-content-wrapper {
   background: var(--bg-card) !important;
   color: var(--text-main) !important;
-  border: 2px solid var(--border-color) !important;
-  font-family: "Courier New", Courier, monospace;
-  font-weight: 700;
-  border-radius: 0 !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px var(--shadow-color) !important;
 }
 
 .leaflet-popup-tip {
@@ -498,8 +548,9 @@ h2, h3 {
   background: var(--log-bg);
   color: var(--log-text);
   border: 1px solid var(--border-color);
+  border-radius: 8px;
   padding: 0.85rem;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.8rem;
   height: 140px;
   overflow-y: auto;
@@ -512,9 +563,10 @@ h2, h3 {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background: var(--accent-purple-bg);
+  background: rgba(192, 132, 252, 0.1);
   color: var(--accent-purple);
   border: 1px solid var(--accent-purple);
+  border-radius: 6px;
   padding: 0.35rem 0.65rem;
   font-size: 0.75rem;
   font-weight: 800;
@@ -522,6 +574,10 @@ h2, h3 {
 }
 
 /* Details Drawer */
+.details-drawer {
+  border-radius: 12px;
+}
+
 .details-drawer summary {
   outline: none;
   font-size: 0.85rem;

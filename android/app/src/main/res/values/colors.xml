@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="brut_black">#FF000000</color>
-    <color name="brut_white">#FFFFFFFF</color>
-    <color name="brut_yellow">#FFFFFF00</color>
-    <color name="brut_red">#FFFF0000</color>
-    <color name="brut_green">#FF00FF00</color>
-    <color name="brut_blue">#FF0000FF</color>
-    <color name="brut_magenta">#FFFF00FF</color>
+    <color name="bg_dark">#FF090D16</color>
+    <color name="card_dark">#FF111827</color>
+    <color name="border_dark">#FF1E293B</color>
+    <color name="accent_cyan">#FF38BDF8</color>
+    <color name="accent_green">#FF34D399</color>
+    <color name="accent_rose">#FFFB7185</color>
+    <color name="accent_purple">#FFC084FC</color>
+    <color name="accent_amber">#FFFBBF24</color>
+    <color name="text_light">#FFF8FAFC</color>
+    <color name="text_muted">#FF8492A6</color>
+    
+    <!-- Legacy aliases for safe compilation -->
+    <color name="brut_black">#FF090D16</color>
+    <color name="brut_white">#FFF8FAFC</color>
+    <color name="brut_yellow">#FFFBBF24</color>
+    <color name="brut_red">#FFFB7185</color>
+    <color name="brut_green">#FF34D399</color>
+    <color name="brut_blue">#FF38BDF8</color>
+    <color name="brut_magenta">#FFC084FC</color>
 </resources>

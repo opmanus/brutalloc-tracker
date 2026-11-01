@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -39,7 +40,7 @@ import com.brutal.tracker.ui.theme.LightText
 import com.brutal.tracker.ui.theme.LightTextMuted
 
 /**
- * Tactical Card with clean 1px border and refined surface color
+ * Modern Card with optional top accent strip and smooth 12dp rounded corners
  */
 @Composable
 fun BrutalCard(
@@ -47,22 +48,35 @@ fun BrutalCard(
     backgroundColor: Color = DarkCard,
     borderColor: Color = DarkBorder,
     borderWidth: Dp = 1.dp,
-    shadowOffset: Dp = 0.dp, // preserved for API compatibility
+    topAccentColor: Color? = null,
+    shadowOffset: Dp = 0.dp,
     contentPadding: PaddingValues = PaddingValues(16.dp),
     content: @Composable () -> Unit
 ) {
+    val shape = RoundedCornerShape(12.dp)
+
     Box(
         modifier = modifier
-            .background(backgroundColor, RoundedCornerShape(6.dp))
-            .border(borderWidth, borderColor, RoundedCornerShape(6.dp))
-            .padding(contentPadding)
+            .clip(shape)
+            .background(backgroundColor, shape)
+            .border(borderWidth, borderColor, shape)
     ) {
-        content()
+        if (topAccentColor != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(3.dp)
+                    .background(topAccentColor)
+            )
+        }
+        Box(modifier = Modifier.padding(contentPadding)) {
+            content()
+        }
     }
 }
 
 /**
- * Tactical Action Button with crisp feedback and no clipping
+ * Modern Tactical Action Button with smooth feedback
  */
 @Composable
 fun BrutalButton(
@@ -70,23 +84,21 @@ fun BrutalButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = AccentCyan,
-    textColor: Color = Color(0xFF090B10),
+    textColor: Color = Color(0xFF090D16),
     borderColor: Color = Color.Transparent,
     borderWidth: Dp = 0.dp,
     shadowOffset: Dp = 0.dp
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-
-    val currentAlpha = if (isPressed) 0.82f else 1.0f
+    val shape = RoundedCornerShape(10.dp)
+    val alpha = if (isPressed) 0.82f else 1.0f
 
     Box(
         modifier = modifier
-            .background(
-                backgroundColor.copy(alpha = currentAlpha),
-                RoundedCornerShape(6.dp)
-            )
-            .border(borderWidth, borderColor, RoundedCornerShape(6.dp))
+            .clip(shape)
+            .background(backgroundColor.copy(alpha = alpha), shape)
+            .border(borderWidth, borderColor, shape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -99,41 +111,43 @@ fun BrutalButton(
             text = text.uppercase(),
             color = textColor,
             fontSize = 14.sp,
-            fontWeight = FontWeight.Black,
-            fontFamily = FontFamily.SansSerif,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Default,
             letterSpacing = 0.5.sp
         )
     }
 }
 
 /**
- * Tactical Pill Tag
+ * Pill Tag with 20dp smooth rounded capsule
  */
 @Composable
 fun BrutalPill(
     text: String,
     backgroundColor: Color,
-    textColor: Color = Color(0xFF090B10),
+    textColor: Color = Color(0xFF090D16),
     modifier: Modifier = Modifier
 ) {
+    val shape = RoundedCornerShape(20.dp)
     Box(
         modifier = modifier
-            .background(backgroundColor, RoundedCornerShape(4.dp))
-            .padding(horizontal = 8.dp, vertical = 3.dp)
+            .background(backgroundColor.copy(alpha = 0.15f), shape)
+            .border(1.dp, backgroundColor, shape)
+            .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
             text = text.uppercase(),
-            color = textColor,
+            color = backgroundColor,
             fontSize = 11.sp,
-            fontWeight = FontWeight.Black,
-            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Default,
             letterSpacing = 0.5.sp
         )
     }
 }
 
 /**
- * Tactical Input Field with proper Column stacking so labels never clip
+ * Tactical Input Field (preserved for settings dialog if needed)
  */
 @Composable
 fun BrutalInputField(
@@ -144,10 +158,11 @@ fun BrutalInputField(
     isPassword: Boolean = false
 ) {
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
-    val inputBg = if (isDark) Color(0xFF090B10) else LightCard
+    val inputBg = if (isDark) Color(0xFF0C101A) else LightCard
     val textCol = if (isDark) DarkText else LightText
     val labelCol = if (isDark) DarkTextMuted else LightTextMuted
     val borderCol = if (isDark) DarkBorder else LightBorder
+    val shape = RoundedCornerShape(8.dp)
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -161,8 +176,8 @@ fun BrutalInputField(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(inputBg, RoundedCornerShape(4.dp))
-                .border(1.dp, borderCol, RoundedCornerShape(4.dp))
+                .background(inputBg, shape)
+                .border(1.dp, borderCol, shape)
                 .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
             BasicTextField(
@@ -172,7 +187,7 @@ fun BrutalInputField(
                 cursorBrush = SolidColor(textCol),
                 textStyle = TextStyle(
                     fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,
                     color = textCol
                 ),

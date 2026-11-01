@@ -19,6 +19,7 @@ concurrency:
 jobs:
   deploy-pages:
     name: Deploy Web Dashboard to GitHub Pages
+    continue-on-error: true
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -82,15 +83,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
-          tag_name: v1.0.0
-          name: "ARKA//TRACK v1.0.0 (Signed Release APK)"
+          tag_name: v1.1.0
+          name: "ARKA//TRACK v1.1.0 (Signed Release APK)"
           body: |
-            ### ⚡ ARKA//TRACK v1.0.0 (Professionally Signed APK)
+            ### ⚡ ARKA//TRACK v1.1.0 (Professionally Signed APK)
             
             - **Signed By**: Arka Mandal (`CN=Arka Mandal, O=Arka Mandal, C=IN`)
             - **End-to-End Encrypted**: AES-256-GCM + PBKDF2-SHA256
-            - **Zero Manual Keys**: Auto-paired via Master Passcode
-            - **Multi-Device Support**: Fleet radar with device names
+            - **In-App Auto-Update**: Automatic one-tap background download & install
+            - **Refined Theme**: High-contrast, sleek telemetry styling across mobile & web
             - **Web Dashboard**: https://opmanus.github.io/brutalloc-tracker/
             
             Download and install `app-release.apk` on your phone.
