@@ -60,7 +60,7 @@ fun MainScreen(
     var passphrase by remember { mutableStateOf("hackme-if-you-can") }
     var brokerHost by remember { mutableStateOf("broker.hivemq.com") }
     var updateIntervalSec by remember { mutableIntStateOf(3) }
-    var webBaseUrl by remember { mutableStateOf("https://<your-username>.github.io/brutalloc-tracker/") }
+    var webBaseUrl by remember { mutableStateOf("https://opmanus.github.io/brutalloc-tracker/") }
 
     val scrollState = rememberScrollState()
 
@@ -357,7 +357,7 @@ fun MainScreen(
                 BrutalButton(
                     text = "SHARE PC DASHBOARD LINK",
                     onClick = {
-                        val shareUrl = "https://<your-username>.github.io/brutalloc-tracker/?channel=${channelId}&pass=${passphrase}"
+                        val shareUrl = "https://opmanus.github.io/brutalloc-tracker/?channel=${channelId}&pass=${passphrase}"
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, "Open BrutalTrack on PC: $shareUrl")

@@ -98,11 +98,11 @@ python3 -m http.server 8080
 Open [`http://localhost:8080`](http://localhost:8080) in any browser (Chrome, Firefox, Zen, Brave, Edge, Safari).
 
 ### Free GitHub Pages Deployment
-1. Push this repository to your GitHub account (e.g. `github.com/<your-username>/brutalloc-tracker`).
+1. Push this repository to your GitHub account (e.g. `github.com/opmanus/brutalloc-tracker`).
 2. Go to your repo **Settings** -> **Pages** -> **Source** -> Select **GitHub Actions**.
 3. The included workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) will automatically build and publish your dashboard to:
    ```
-   https://<your-username>.github.io/brutalloc-tracker/
+   https://opmanus.github.io/brutalloc-tracker/
    ```
 4. Enter your **Channel ID** and **Passphrase**, then click **`CONNECT & LISTEN`**.
 5. Once your Android app broadcasts, the map immediately pans to your location, draws live breadcrumbs, animates the velocity meter, and decodes packet logs!
@@ -110,7 +110,7 @@ Open [`http://localhost:8080`](http://localhost:8080) in any browser (Chrome, Fi
 ### One-Click Sync Link
 You can open or bookmark a pre-configured link with auto-connect:
 ```
-https://<your-username>.github.io/brutalloc-tracker/?channel=my-rover-01&pass=super-secret-key-99&autoconnect=1
+https://opmanus.github.io/brutalloc-tracker/?channel=my-rover-01&pass=super-secret-key-99&autoconnect=1
 ```
 
 ---

@@ -1,4 +1,4 @@
-name: Deploy BrutalTrack Web Dashboard to GitHub Pages
+name: CI/CD - Deploy Dashboard & Build Android APK
 
 on:
   push:
@@ -8,28 +8,29 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  group: "ci-cd"
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  deploy-pages:
+    name: Deploy Web Dashboard to GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Pages
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
 
-      - name: Upload Artifact
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'web'
@@ -37,3 +38,50 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK with Gradle
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BrutalTrack-app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          tag_name: v1.0.0
+          name: "BRUTAL//TRACK v1.0.0 (Release APK)"
+          body: |
+            ### ⚡ BRUTAL//TRACK v1.0.0
+            
+            - **End-to-End Encrypted (AES-256-GCM) Live GPS Telemetry**
+            - **Neo-Brutalism Interface** with live speedometer & coordinate HUD
+            - **Foreground Tracking Service** (runs when screen is locked)
+            - **Web Dashboard**: https://opmanus.github.io/brutalloc-tracker/
+            
+            Download the attached `app-debug.apk` directly to your phone to install.
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

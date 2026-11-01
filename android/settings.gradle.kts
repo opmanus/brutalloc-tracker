@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = java.net.URI("https://repo.eclipse.org/content/repositories/paho-releases/") }
+        maven { url = uri("https://repo.eclipse.org/content/repositories/paho-releases/") }
     }
 }
 
