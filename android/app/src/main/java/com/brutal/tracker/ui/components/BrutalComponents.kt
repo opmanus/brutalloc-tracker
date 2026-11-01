@@ -164,13 +164,18 @@ fun BrutalInputField(
     modifier: Modifier = Modifier,
     isPassword: Boolean = false
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val inputBg = if (isDark) Color(0xFF090A0D) else BrutalWhite
+    val textCol = if (isDark) BrutalWhite else BrutalBlack
+    val borderCol = if (isDark) Color(0xFF3B4252) else BrutalBlack
+
     Box(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label.uppercase(),
             fontWeight = FontWeight.Black,
             fontSize = 11.sp,
             letterSpacing = 0.5.sp,
-            color = BrutalBlack,
+            color = textCol,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         Box(
@@ -185,20 +190,20 @@ fun BrutalInputField(
                         size = size
                     )
                 }
-                .background(BrutalWhite, RoundedCornerShape(0.dp))
-                .border(2.dp, BrutalBlack, RoundedCornerShape(0.dp))
+                .background(inputBg, RoundedCornerShape(0.dp))
+                .border(2.dp, borderCol, RoundedCornerShape(0.dp))
                 .padding(horizontal = 12.dp, vertical = 12.dp)
         ) {
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
-                cursorBrush = SolidColor(BrutalBlack),
+                cursorBrush = SolidColor(textCol),
                 textStyle = TextStyle(
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp,
-                    color = BrutalBlack
+                    color = textCol
                 ),
                 modifier = Modifier.fillMaxWidth()
             )

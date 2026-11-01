@@ -1,6 +1,7 @@
 /**
  * BrutalTrack Web Application Logic
  * High-performance real-time telemetry decoding and mapping
+ * Features Refined Brutalism & Full Dark/Light Mode Theme Switching
  */
 
 // Application State
@@ -8,6 +9,8 @@ const state = {
   client: null,
   connected: false,
   map: null,
+  tileLayer: null,
+  currentTheme: "dark",
   marker: null,
   accuracyCircle: null,
   polyline: null,
@@ -20,6 +23,7 @@ const state = {
 
 // UI Element References
 const elements = {
+  themeToggleBtn: document.getElementById("themeToggleBtn"),
   channelInput: document.getElementById("channelInput"),
   passphraseInput: document.getElementById("passphraseInput"),
   brokerSelect: document.getElementById("brokerSelect"),
@@ -45,6 +49,62 @@ const elements = {
   packetLog: document.getElementById("packetLog")
 };
 
+// Theme Management
+const THEME_TILES = {
+  dark: {
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    options: {
+      subdomains: "abcd",
+      maxZoom: 20,
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+    }
+  },
+  light: {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    options: {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+    }
+  }
+};
+
+function setTheme(theme) {
+  state.currentTheme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("brutal_theme", theme);
+
+  if (elements.themeToggleBtn) {
+    elements.themeToggleBtn.textContent = theme === "dark" ? "THEME: DARK ☾" : "THEME: LIGHT ☼";
+  }
+
+  // Update map tiles
+  if (state.map) {
+    if (state.tileLayer) {
+      state.map.removeLayer(state.tileLayer);
+    }
+    const conf = THEME_TILES[theme] || THEME_TILES.dark;
+    state.tileLayer = L.tileLayer(conf.url, conf.options).addTo(state.map);
+
+    // Update trail color for optimal contrast
+    if (state.polyline) {
+      state.polyline.setStyle({
+        color: theme === "dark" ? "#38bdf8" : "#2563eb"
+      });
+    }
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("brutal_theme");
+  if (saved && (saved === "dark" || saved === "light")) {
+    setTheme(saved);
+  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
+    setTheme("light");
+  } else {
+    setTheme("dark");
+  }
+}
+
 // Initialize Map
 function initMap() {
   state.map = L.map("map", {
@@ -52,27 +112,24 @@ function initMap() {
     attributionControl: true
   }).setView([20.0, 0.0], 3);
 
-  // High-contrast clean OpenStreetMap tiles
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(state.map);
+  const conf = THEME_TILES[state.currentTheme] || THEME_TILES.dark;
+  state.tileLayer = L.tileLayer(conf.url, conf.options).addTo(state.map);
 
-  // Brutalist Custom Marker Icon (Sharp rectangular crosshair)
+  // Brutalist Custom Marker Icon (Sharp rectangular crosshair target)
   const brutalIcon = L.divIcon({
     className: "brutal-map-marker",
     html: `
       <div style="
         width: 24px;
         height: 24px;
-        background: #FF0000;
+        background: #ef4444;
         border: 3px solid #000000;
         box-shadow: 3px 3px 0 #000000;
         display: flex;
         align-items: center;
         justify-content: center;
       ">
-        <div style="width: 6px; height: 6px; background: #FFFF00; border: 1px solid #000;"></div>
+        <div style="width: 6px; height: 6px; background: #fbbf24; border: 1px solid #000;"></div>
       </div>
     `,
     iconSize: [24, 24],
@@ -81,7 +138,7 @@ function initMap() {
 
   state.marker = L.marker([0, 0], { icon: brutalIcon });
   state.polyline = L.polyline([], {
-    color: "#0000FF",
+    color: state.currentTheme === "dark" ? "#38bdf8" : "#2563eb",
     weight: 5,
     opacity: 0.9,
     lineJoin: "miter"
@@ -91,7 +148,7 @@ function initMap() {
 // Log to Cryptographic Raw Packet Stream Box
 function logMessage(msg, isError = false) {
   const time = new Date().toTimeString().split(" ")[0];
-  const color = isError ? "var(--brut-red)" : "var(--brut-green)";
+  const color = isError ? "var(--accent-red)" : "var(--log-text)";
   const line = `<div style="color: ${color}; margin-bottom: 4px;">[${time}] ${msg}</div>`;
   elements.packetLog.innerHTML = line + elements.packetLog.innerHTML;
 }
@@ -280,9 +337,9 @@ function handleLocationUpdate(loc) {
     if (!state.accuracyCircle) {
       state.accuracyCircle = L.circle(latLng, {
         radius: loc.acc,
-        color: "#FF0000",
-        fillColor: "#FFFF00",
-        fillOpacity: 0.25,
+        color: "#ef4444",
+        fillColor: "#fbbf24",
+        fillOpacity: 0.2,
         weight: 2
       }).addTo(state.map);
     } else {
@@ -294,7 +351,7 @@ function handleLocationUpdate(loc) {
   // Update Polyline
   state.polyline.addLatLng(latLng);
 
-  // Auto-center map if first point or user kept centered
+  // Auto-center map if first point
   if (state.trackHistory.length === 1) {
     state.map.setView(latLng, 16);
   }
@@ -302,7 +359,7 @@ function handleLocationUpdate(loc) {
   // Popup content
   state.marker.bindPopup(`
     <div style="font-size: 0.9rem;">
-      <div style="font-size: 1.1rem; margin-bottom: 4px;">TARGET TRACKED</div>
+      <div style="font-size: 1.1rem; margin-bottom: 4px; font-weight: 900;">TARGET TRACKED</div>
       <div>LAT: ${lat.toFixed(6)}</div>
       <div>LON: ${lon.toFixed(6)}</div>
       <div>SPD: ${speedKmh} KM/H</div>
@@ -429,10 +486,16 @@ function setupEvents() {
     elements.soundToggleBtn.textContent = `AUDIO CHIRP: ${state.audioEnabled ? "ON" : "OFF"}`;
     if (state.audioEnabled) playChirp();
   });
+
+  elements.themeToggleBtn.addEventListener("click", () => {
+    const next = state.currentTheme === "dark" ? "light" : "dark";
+    setTheme(next);
+  });
 }
 
 // Startup
 window.addEventListener("DOMContentLoaded", () => {
+  initTheme();
   initMap();
   setupEvents();
   parseQueryParams();

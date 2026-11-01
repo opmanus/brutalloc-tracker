@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="style.css">
   <style>
     :focus-visible {
-      outline: 4px solid #0000FF !important;
+      outline: 4px solid #38bdf8 !important;
       outline-offset: 3px !important;
     }
   </style>
@@ -23,18 +23,19 @@
   <header class="brutal-header">
     <div>
       <h1>BRUTAL//TRACK</h1>
-      <div class="mono" style="font-size: 0.95rem; margin-top: 0.4rem; color: var(--brut-yellow);">
+      <div class="mono" style="font-size: 0.95rem; margin-top: 0.4rem; color: var(--accent-yellow);">
         RAW LIVE TELEMETRY RELAY [AES-256-GCM E2EE]
       </div>
     </div>
     <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <button id="themeToggleBtn" class="button button--theme" title="Toggle Dark/Light Mode">THEME: DARK ☾</button>
       <span class="e2ee-tag">🔒 256-BIT ENCRYPTED</span>
       <div id="statusBadge" class="status-pill disconnected">STANDBY // OFFLINE</div>
     </div>
   </header>
 
   <!-- Setup & Connection Configuration Card -->
-  <section class="card card--yellow" style="margin-bottom: 2rem;">
+  <section class="card card--connection" style="margin-bottom: 2rem;">
     <h2>01. RELAY CONNECTION &amp; DECRYPTION KEY</h2>
     <div class="grid" style="margin-bottom: 1rem;">
       <div class="form-group">
@@ -63,24 +64,24 @@
     </div>
 
     <div class="button-group">
-      <button id="connectBtn" class="button button--black">CONNECT &amp; LISTEN</button>
+      <button id="connectBtn" class="button button--primary">CONNECT &amp; LISTEN</button>
       <button id="disconnectBtn" class="button button--red" style="display: none;">KILL CONNECTION</button>
-      <button id="shareLinkBtn" class="button button--white">COPY SYNC URL</button>
-      <button id="soundToggleBtn" class="button button--white">AUDIO CHIRP: OFF</button>
+      <button id="shareLinkBtn" class="button">COPY SYNC URL</button>
+      <button id="soundToggleBtn" class="button">AUDIO CHIRP: OFF</button>
     </div>
   </section>
 
   <!-- Live Telemetry HUD Cards -->
   <section class="grid-4">
     <!-- Card 1: GPS Position -->
-    <div class="card card--white">
+    <div class="card card--telemetry">
       <div class="hud-label">COORDINATES (WGS84)</div>
       <div id="hudCoords" class="hud-value" style="font-size: clamp(1.4rem, 2.5vw, 1.9rem);">00.0000, 00.0000</div>
       <div class="hud-sub mono" id="hudBearing">BEARING: ---° N</div>
     </div>
 
     <!-- Card 2: Speedometer -->
-    <div class="card card--red">
+    <div class="card card--speed">
       <div class="hud-label">VELOCITY / SPEED</div>
       <div id="hudSpeed" class="hud-value">0.0 <span style="font-size: 1.2rem;">KM/H</span></div>
       <div class="speed-bar-container">
@@ -90,14 +91,14 @@
     </div>
 
     <!-- Card 3: Altitude & Precision -->
-    <div class="card card--magenta">
+    <div class="card card--altitude">
       <div class="hud-label">ALTITUDE &amp; ACCURACY</div>
       <div id="hudAltitude" class="hud-value">-- M</div>
       <div class="hud-sub mono" id="hudAccuracy">ACCURACY RADIUS: ± -- M</div>
     </div>
 
     <!-- Card 4: Device Health & Telemetry -->
-    <div class="card card--white">
+    <div class="card card--device">
       <div class="hud-label">DEVICE STATE</div>
       <div id="hudBattery" class="hud-value">--%</div>
       <div class="hud-sub mono" id="hudLastSeen">PINGS: 0 | PENDING</div>
@@ -111,19 +112,19 @@
         LIVE TACTICAL RADAR [BREADCRUMB TRAIL]
       </div>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button id="recenterBtn" class="button button--white" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">RECENTER</button>
+        <button id="recenterBtn" class="button" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">RECENTER</button>
         <button id="clearTrailBtn" class="button button--red" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">CLEAR TRAIL</button>
-        <button id="exportGpxBtn" class="button button--black" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">EXPORT GPX</button>
+        <button id="exportGpxBtn" class="button button--primary" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">EXPORT GPX</button>
       </div>
     </div>
     <div id="map"></div>
   </section>
 
   <!-- Raw Encrypted Packet Inspector (Cryptographic Proof) -->
-  <section class="card card--black" style="margin-bottom: 2rem;">
+  <section class="card" style="margin-bottom: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-      <h3 style="color: var(--brut-yellow); margin: 0;">02. CRYPTOGRAPHIC RAW PACKET STREAM</h3>
-      <span class="mono" style="font-size: 0.85rem; color: var(--brut-white);">DECRYPTING REAL-TIME</span>
+      <h3 style="color: var(--accent-yellow); margin: 0;">02. CRYPTOGRAPHIC RAW PACKET STREAM</h3>
+      <span class="mono" style="font-size: 0.85rem; color: var(--text-muted);">DECRYPTING REAL-TIME</span>
     </div>
     <div id="packetLog" class="log-box">
       [00:00:00] STANDBY: Awaiting WebSocket connection and incoming encrypted location envelopes...
@@ -133,7 +134,7 @@
   <!-- Footer -->
   <footer class="footer">
     <div>BRUTAL//TRACK · OPEN-SOURCE ZERO-LEAK GPS TELEMETRY</div>
-    <div>DESIGN: BRUTALISM // 0PX RADIUS // E2EE VERIFIED</div>
+    <div>DESIGN: REFINED BRUTALISM // E2EE VERIFIED</div>
   </footer>
 
   <!-- Leaflet JS -->

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +43,20 @@ import com.brutal.tracker.ui.components.BrutalInputField
 import com.brutal.tracker.ui.components.BrutalPill
 import com.brutal.tracker.ui.theme.BrutalBlack
 import com.brutal.tracker.ui.theme.BrutalBlue
+import com.brutal.tracker.ui.theme.BrutalDarkBg
+import com.brutal.tracker.ui.theme.BrutalDarkBorder
+import com.brutal.tracker.ui.theme.BrutalDarkCard
+import com.brutal.tracker.ui.theme.BrutalDarkCardGreen
+import com.brutal.tracker.ui.theme.BrutalDarkCardMagenta
+import com.brutal.tracker.ui.theme.BrutalDarkCardRed
+import com.brutal.tracker.ui.theme.BrutalDarkCardYellow
 import com.brutal.tracker.ui.theme.BrutalGreen
+import com.brutal.tracker.ui.theme.BrutalLightBg
+import com.brutal.tracker.ui.theme.BrutalLightCard
+import com.brutal.tracker.ui.theme.BrutalLightCardGreen
+import com.brutal.tracker.ui.theme.BrutalLightCardMagenta
+import com.brutal.tracker.ui.theme.BrutalLightCardRed
+import com.brutal.tracker.ui.theme.BrutalLightCardYellow
 import com.brutal.tracker.ui.theme.BrutalMagenta
 import com.brutal.tracker.ui.theme.BrutalRed
 import com.brutal.tracker.ui.theme.BrutalWhite
@@ -55,19 +69,28 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val serviceState by LocationService.serviceState.collectAsState()
+    val isDark = isSystemInDarkTheme()
+
+    val screenBg = if (isDark) BrutalDarkBg else BrutalLightBg
+    val textColor = if (isDark) BrutalWhite else BrutalBlack
+    val borderColor = if (isDark) BrutalDarkBorder else BrutalBlack
+    val cardBg = if (isDark) BrutalDarkCard else BrutalLightCard
+    val yellowCardBg = if (isDark) BrutalDarkCardYellow else BrutalLightCardYellow
+    val redCardBg = if (isDark) BrutalDarkCardRed else BrutalLightCardRed
+    val magentaCardBg = if (isDark) BrutalDarkCardMagenta else BrutalLightCardMagenta
+    val greenCardBg = if (isDark) BrutalDarkCardGreen else BrutalLightCardGreen
 
     var channelId by remember { mutableStateOf("alpha-squad-01") }
     var passphrase by remember { mutableStateOf("hackme-if-you-can") }
     var brokerHost by remember { mutableStateOf("broker.hivemq.com") }
     var updateIntervalSec by remember { mutableIntStateOf(3) }
-    var webBaseUrl by remember { mutableStateOf("https://opmanus.github.io/brutalloc-tracker/") }
 
     val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BrutalWhite)
+            .background(screenBg)
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
@@ -79,8 +102,8 @@ fun MainScreen(
                     val shadowPx = 5.dp.toPx()
                     drawRect(BrutalBlack, Offset(shadowPx, shadowPx), size)
                 }
-                .background(BrutalBlack, RoundedCornerShape(0.dp))
-                .border(3.dp, BrutalBlack, RoundedCornerShape(0.dp))
+                .background(if (isDark) BrutalDarkCard else BrutalBlack, RoundedCornerShape(0.dp))
+                .border(3.dp, borderColor, RoundedCornerShape(0.dp))
                 .padding(16.dp)
         ) {
             Column {
@@ -150,8 +173,8 @@ fun MainScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BrutalBlack)
-                .border(2.dp, BrutalBlack)
+                .background(if (isDark) BrutalDarkCard else BrutalBlack)
+                .border(2.dp, borderColor)
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             Text(
@@ -170,6 +193,7 @@ fun MainScreen(
             text = "TELEMETRY HUD",
             fontWeight = FontWeight.Black,
             fontSize = 18.sp,
+            color = textColor,
             letterSpacing = (-0.5).sp
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -179,7 +203,8 @@ fun MainScreen(
         // Row 1: Coordinates Card
         BrutalCard(
             modifier = Modifier.fillMaxWidth(),
-            backgroundColor = BrutalWhite,
+            backgroundColor = cardBg,
+            borderColor = borderColor,
             shadowOffset = 4.dp
         ) {
             Column {
@@ -188,7 +213,7 @@ fun MainScreen(
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Black,
                     fontSize = 11.sp,
-                    color = BrutalBlack
+                    color = textColor
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 val coordsText = if (pkt != null) "%.5f, %.5f".format(pkt.lat, pkt.lon) else "WAITING FOR GPS..."
@@ -197,14 +222,14 @@ fun MainScreen(
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Black,
                     fontSize = 20.sp,
-                    color = BrutalBlack
+                    color = textColor
                 )
                 if (pkt != null) {
                     Text(
                         text = "BEARING: ${pkt.bearing.toInt()}° | ALT: ${pkt.alt.toInt()}M",
                         fontFamily = FontFamily.Monospace,
                         fontSize = 12.sp,
-                        color = BrutalBlack
+                        color = textColor.copy(alpha = 0.8f)
                     )
                 }
             }
@@ -220,7 +245,8 @@ fun MainScreen(
             // Speed Card
             BrutalCard(
                 modifier = Modifier.weight(1f),
-                backgroundColor = BrutalRed,
+                backgroundColor = redCardBg,
+                borderColor = borderColor,
                 shadowOffset = 4.dp
             ) {
                 Column {
@@ -228,7 +254,7 @@ fun MainScreen(
                         text = "VELOCITY",
                         fontWeight = FontWeight.Black,
                         fontSize = 11.sp,
-                        color = BrutalBlack
+                        color = textColor
                     )
                     val speedKmh = if (pkt != null) (pkt.spd * 3.6).toInt() else 0
                     Text(
@@ -236,15 +262,16 @@ fun MainScreen(
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Black,
                         fontSize = 22.sp,
-                        color = BrutalBlack
+                        color = textColor
                     )
                 }
             }
 
-            // Accuracy & Battery Card
+            // Accuracy Card
             BrutalCard(
                 modifier = Modifier.weight(1f),
-                backgroundColor = BrutalMagenta,
+                backgroundColor = magentaCardBg,
+                borderColor = borderColor,
                 shadowOffset = 4.dp
             ) {
                 Column {
@@ -252,7 +279,7 @@ fun MainScreen(
                         text = "GPS ACCURACY",
                         fontWeight = FontWeight.Black,
                         fontSize = 11.sp,
-                        color = BrutalBlack
+                        color = textColor
                     )
                     val accText = if (pkt != null) "±${pkt.acc.toInt()} M" else "±-- M"
                     Text(
@@ -260,7 +287,7 @@ fun MainScreen(
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Black,
                         fontSize = 22.sp,
-                        color = BrutalBlack
+                        color = textColor
                     )
                 }
             }
@@ -271,7 +298,8 @@ fun MainScreen(
         // Device Telemetry Card
         BrutalCard(
             modifier = Modifier.fillMaxWidth(),
-            backgroundColor = BrutalWhite,
+            backgroundColor = greenCardBg,
+            borderColor = borderColor,
             shadowOffset = 4.dp
         ) {
             Row(
@@ -279,13 +307,13 @@ fun MainScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("DEVICE BATTERY", fontWeight = FontWeight.Black, fontSize = 11.sp)
+                    Text("DEVICE BATTERY", fontWeight = FontWeight.Black, fontSize = 11.sp, color = textColor)
                     val batText = if (pkt != null) "${pkt.battery}%" + if (pkt.isCharging) " (⚡)" else "" else "--%"
-                    Text(batText, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                    Text(batText, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("TOTAL PINGS", fontWeight = FontWeight.Black, fontSize = 11.sp)
-                    Text("${serviceState.pingsSent}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                    Text("TOTAL PINGS", fontWeight = FontWeight.Black, fontSize = 11.sp, color = textColor)
+                    Text("${serviceState.pingsSent}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
                 }
             }
         }
@@ -295,14 +323,16 @@ fun MainScreen(
         // CONFIGURATION CARD
         BrutalCard(
             modifier = Modifier.fillMaxWidth(),
-            backgroundColor = BrutalYellow,
+            backgroundColor = yellowCardBg,
+            borderColor = borderColor,
             shadowOffset = 5.dp
         ) {
             Column {
                 Text(
                     text = "SETTINGS // ENCRYPTION",
                     fontWeight = FontWeight.Black,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    color = textColor
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -336,7 +366,8 @@ fun MainScreen(
         // PC SYNC LINK CARD
         BrutalCard(
             modifier = Modifier.fillMaxWidth(),
-            backgroundColor = BrutalBlue,
+            backgroundColor = cardBg,
+            borderColor = borderColor,
             shadowOffset = 5.dp
         ) {
             Column {
@@ -344,13 +375,13 @@ fun MainScreen(
                     text = "DESKTOP / PC SYNC",
                     fontWeight = FontWeight.Black,
                     fontSize = 16.sp,
-                    color = BrutalWhite
+                    color = textColor
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Open the web dashboard on your PC or other devices to view live decrypted tracking on a tactical map.",
                     fontSize = 13.sp,
-                    color = BrutalWhite
+                    color = textColor.copy(alpha = 0.85f)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -365,7 +396,7 @@ fun MainScreen(
                         }
                         context.startActivity(Intent.createChooser(sendIntent, "Share Live Track Link"))
                     },
-                    backgroundColor = BrutalWhite,
+                    backgroundColor = BrutalYellow,
                     textColor = BrutalBlack,
                     modifier = Modifier.fillMaxWidth()
                 )
