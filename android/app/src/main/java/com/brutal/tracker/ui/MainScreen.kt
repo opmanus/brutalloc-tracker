@@ -5,6 +5,9 @@ import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,8 +94,9 @@ fun MainScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(screenBg)
+            .systemBarsPadding()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         // Brutalist Header
         Box(
@@ -403,6 +407,6 @@ fun MainScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
