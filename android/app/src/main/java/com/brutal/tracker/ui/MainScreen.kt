@@ -39,7 +39,6 @@ import com.brutal.tracker.data.TrackerConfig
 import com.brutal.tracker.service.LocationService
 import com.brutal.tracker.ui.components.BrutalButton
 import com.brutal.tracker.ui.components.BrutalCard
-import com.brutal.tracker.ui.components.BrutalInputField
 import com.brutal.tracker.ui.components.BrutalPill
 import com.brutal.tracker.ui.theme.AccentAmber
 import com.brutal.tracker.ui.theme.AccentCyan
@@ -321,48 +320,6 @@ fun MainScreen(
                         Text("PINGS TRANSMITTED", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = textMutedColor)
                         Text("${serviceState.pingsSent}", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black, fontSize = 18.sp, color = textColor)
                     }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // CONFIGURATION CARD
-            BrutalCard(
-                modifier = Modifier.fillMaxWidth(),
-                backgroundColor = cardBg,
-                borderColor = borderColor
-            ) {
-                Column {
-                    Text(
-                        text = "CONFIGURATION // ENCRYPTION",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 14.sp,
-                        color = textColor
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    BrutalInputField(
-                        value = deviceName,
-                        onValueChange = { deviceName = it },
-                        label = "Device Name (e.g. Arka's Phone / Car / Bike)"
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    BrutalInputField(
-                        value = passphrase,
-                        onValueChange = { passphrase = it },
-                        label = "Master Passcode (Default: hackme-if-you-can)",
-                        isPassword = true
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    BrutalInputField(
-                        value = brokerHost,
-                        onValueChange = { brokerHost = it },
-                        label = "MQTT Broker Relay Host"
-                    )
                 }
             }
 
