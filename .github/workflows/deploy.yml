@@ -1,4 +1,4 @@
-name: CI/CD - Deploy Dashboard & Build Android APK
+name: CI/CD - Deploy Dashboard & Build Signed APK
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   build-android:
-    name: Build Android APK
+    name: Build Signed Android APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -56,32 +56,44 @@ jobs:
       - name: Make Gradle Wrapper Executable
         run: chmod +x android/gradlew
 
-      - name: Build Debug APK with Gradle
-        working-directory: android
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Decode Release Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > /tmp/release.keystore
 
-      - name: Upload APK as Workflow Artifact
+      - name: Build Signed Release APK with Gradle
+        working-directory: android
+        env:
+          KEYSTORE_PATH: /tmp/release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Upload Signed Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BrutalTrack-app-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: ArkaTrack-Signed-Release-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
 
-      - name: Create GitHub Release with APK
+      - name: Create GitHub Release with Signed APK
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
           tag_name: v1.0.0
-          name: "BRUTAL//TRACK v1.0.0 (Release APK)"
+          name: "ARKA//TRACK v1.0.0 (Signed Release APK)"
           body: |
-            ### ⚡ BRUTAL//TRACK v1.0.0
+            ### ⚡ ARKA//TRACK v1.0.0 (Professionally Signed APK)
             
-            - **End-to-End Encrypted (AES-256-GCM) Live GPS Telemetry**
-            - **Neo-Brutalism Interface** with live speedometer & coordinate HUD
-            - **Foreground Tracking Service** (runs when screen is locked)
+            - **Signed By**: Arka Mandal (`CN=Arka Mandal, O=Arka Mandal, C=IN`)
+            - **End-to-End Encrypted**: AES-256-GCM + PBKDF2-SHA256
+            - **Zero Manual Keys**: Auto-paired via Master Passcode
+            - **Multi-Device Support**: Fleet radar with device names
             - **Web Dashboard**: https://opmanus.github.io/brutalloc-tracker/
             
-            Download the attached `app-debug.apk` directly to your phone to install.
-          files: android/app/build/outputs/apk/debug/app-debug.apk
+            Download and install `app-release.apk` on your phone.
+          files: android/app/build/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

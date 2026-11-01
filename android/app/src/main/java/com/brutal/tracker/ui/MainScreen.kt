@@ -80,7 +80,7 @@ fun MainScreen(
     val magentaCardBg = if (isDark) BrutalDarkCardMagenta else BrutalLightCardMagenta
     val greenCardBg = if (isDark) BrutalDarkCardGreen else BrutalLightCardGreen
 
-    var channelId by remember { mutableStateOf("alpha-squad-01") }
+    var deviceName by remember { mutableStateOf("Arka's Phone") }
     var passphrase by remember { mutableStateOf("hackme-if-you-can") }
     var brokerHost by remember { mutableStateOf("broker.hivemq.com") }
     var updateIntervalSec by remember { mutableIntStateOf(3) }
@@ -145,7 +145,7 @@ fun MainScreen(
                 text = "⚡ START BROADCAST",
                 onClick = {
                     val config = TrackerConfig(
-                        channelId = channelId.trim(),
+                        deviceName = deviceName.trim(),
                         passphrase = passphrase.trim(),
                         brokerHost = brokerHost.trim(),
                         brokerPort = 1883,
@@ -337,9 +337,9 @@ fun MainScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 BrutalInputField(
-                    value = channelId,
-                    onValueChange = { channelId = it },
-                    label = "Channel ID (Share with your PC)"
+                    value = deviceName,
+                    onValueChange = { deviceName = it },
+                    label = "DEVICE NAME (E.G. ARKA'S PHONE / CAR / BIKE)"
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -347,7 +347,7 @@ fun MainScreen(
                 BrutalInputField(
                     value = passphrase,
                     onValueChange = { passphrase = it },
-                    label = "AES-256 Secret Passphrase",
+                    label = "MASTER ENCRYPTION KEY (E2EE)",
                     isPassword = true
                 )
 
@@ -379,16 +379,16 @@ fun MainScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Open the web dashboard on your PC or other devices to view live decrypted tracking on a tactical map.",
+                    text = "Open your private web dashboard on PC or tablet. With your master passphrase, all your devices are auto-discovered and mapped simultaneously.",
                     fontSize = 13.sp,
                     color = textColor.copy(alpha = 0.85f)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
                 BrutalButton(
-                    text = "SHARE PC DASHBOARD LINK",
+                    text = "SHARE PRIVATE DASHBOARD LINK",
                     onClick = {
-                        val shareUrl = "https://opmanus.github.io/brutalloc-tracker/?channel=${channelId}&pass=${passphrase}"
+                        val shareUrl = "https://opmanus.github.io/brutalloc-tracker/?pass=${passphrase}&autoconnect=1"
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, "Open BrutalTrack on PC: $shareUrl")

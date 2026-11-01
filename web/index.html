@@ -3,145 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BRUTAL//TRACK - E2EE LIVE GPS TELEMETRY</title>
+  <title>ARKA MANDAL // PRIVATE GPS TELEMETRY</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   
-  <!-- Brutalist Style -->
+  <!-- Refined Styling -->
   <link rel="stylesheet" href="style.css">
   <style>
     :focus-visible {
-      outline: 4px solid #38bdf8 !important;
-      outline-offset: 3px !important;
+      outline: 3px solid #38bdf8 !important;
+      outline-offset: 2px !important;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Brutalist Header -->
-  <header class="brutal-header">
-    <div>
-      <h1>BRUTAL//TRACK</h1>
-      <div class="mono" style="font-size: 0.95rem; margin-top: 0.4rem; color: var(--accent-yellow);">
-        RAW LIVE TELEMETRY RELAY [AES-256-GCM E2EE]
+  <!-- Gatekeeper / Passcode Lock Screen -->
+  <div id="gatekeeperModal" class="gatekeeper-overlay">
+    <div class="card gatekeeper-card">
+      <div class="lock-icon mono" style="font-size: 1rem; font-weight: 800; color: var(--accent-cyan);">[ACCESS LOCKED]</div>
+      <h2>ARKA MANDAL</h2>
+      <div class="mono" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+        PRIVATE ENCRYPTED GPS TELEMETRY TERMINAL
       </div>
+      <form id="unlockForm" onsubmit="event.preventDefault(); unlockDashboard();">
+        <div class="form-group" style="text-align: left;">
+          <label for="masterPassInput">ENTER MASTER PASSCODE</label>
+          <input type="password" id="masterPassInput" class="input" placeholder="Enter private encryption key" autofocus autocomplete="current-password">
+        </div>
+        <div style="margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; justify-content: flex-start;">
+          <input type="checkbox" id="rememberPassCheck" checked style="width: 18px; height: 18px; cursor: pointer;">
+          <label for="rememberPassCheck" style="margin: 0; font-size: 0.85rem; cursor: pointer; text-transform: none; font-weight: 600;">Remember on this device</label>
+        </div>
+        <button type="submit" class="button button--primary" style="width: 100%; justify-content: center;">
+          UNLOCK TERMINAL
+        </button>
+      </form>
     </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-      <button id="themeToggleBtn" class="button button--theme" title="Toggle Dark/Light Mode">THEME: DARK ☾</button>
-      <span class="e2ee-tag">🔒 256-BIT ENCRYPTED</span>
-      <div id="statusBadge" class="status-pill disconnected">STANDBY // OFFLINE</div>
-    </div>
-  </header>
+  </div>
 
-  <!-- Setup & Connection Configuration Card -->
-  <section class="card card--connection" style="margin-bottom: 2rem;">
-    <h2>01. RELAY CONNECTION &amp; DECRYPTION KEY</h2>
-    <div class="grid" style="margin-bottom: 1rem;">
-      <div class="form-group">
-        <label for="channelInput">TRACKING CHANNEL ID (MATCH WITH ANDROID APP)</label>
-        <input type="text" id="channelInput" class="input" value="alpha-squad-01" placeholder="e.g. my-device-77" autocomplete="off" spellcheck="false">
+  <!-- Main Dashboard Container -->
+  <div id="mainDashboard" class="dashboard-container" style="display: none;">
+    <!-- Top Header -->
+    <header class="brutal-header">
+      <div>
+        <h1>ARKA//TRACK</h1>
+        <div class="mono header-sub">
+          MULTI-DEVICE LIVE TELEMETRY [AES-256-GCM E2EE]
+        </div>
       </div>
-      <div class="form-group">
-        <label for="passphraseInput">E2EE SECRET PASSPHRASE (DECRYPT ON-THE-FLY)</label>
-        <input type="password" id="passphraseInput" class="input" value="hackme-if-you-can" placeholder="Enter matching encryption key" autocomplete="off">
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="button button--ghost" title="Toggle Dark/Light Mode">THEME: DARK ☾</button>
+        <span class="e2ee-tag">[E2EE ENCRYPTED]</span>
+        <div id="statusBadge" class="status-pill disconnected">STANDBY</div>
+        <button id="lockTerminalBtn" class="button button--ghost" title="Lock Terminal">LOCK</button>
       </div>
-    </div>
+    </header>
 
-    <div class="grid" style="margin-bottom: 1rem;">
-      <div class="form-group">
-        <label for="brokerSelect">PUBLIC MQTT BROKER (ZERO-SETUP / FREE WSS RELAY)</label>
-        <select id="brokerSelect" class="input" style="cursor: pointer;">
-          <option value="wss://broker.hivemq.com:8884/mqtt">HiveMQ Public WebSocket [wss://broker.hivemq.com:8884/mqtt]</option>
-          <option value="wss://broker.emqx.io:8084/mqtt">EMQX Public WebSocket [wss://broker.emqx.io:8084/mqtt]</option>
-          <option value="custom">CUSTOM BROKER URL...</option>
-        </select>
+    <!-- Multi-Device Bar -->
+    <section class="card device-bar-card">
+      <div class="device-bar-header">
+        <div class="device-bar-title">CONNECTED DEVICES</div>
+        <div id="deviceCount" class="mono device-count-badge">0 ACTIVE</div>
       </div>
-      <div class="form-group" id="customBrokerGroup" style="display: none;">
-        <label for="customBrokerInput">CUSTOM WEBSOCKET URL</label>
-        <input type="text" id="customBrokerInput" class="input" placeholder="wss://your-server:8084/mqtt">
+      <div id="deviceListTabs" class="device-tabs">
+        <div class="device-tab active" data-device-id="all">
+          <span class="dot live"></span>
+          <span>ALL DEVICES (FLEET)</span>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="button-group">
-      <button id="connectBtn" class="button button--primary">CONNECT &amp; LISTEN</button>
-      <button id="disconnectBtn" class="button button--red" style="display: none;">KILL CONNECTION</button>
-      <button id="shareLinkBtn" class="button">COPY SYNC URL</button>
-      <button id="soundToggleBtn" class="button">AUDIO CHIRP: OFF</button>
-    </div>
-  </section>
-
-  <!-- Live Telemetry HUD Cards -->
-  <section class="grid-4">
-    <!-- Card 1: GPS Position -->
-    <div class="card card--telemetry">
-      <div class="hud-label">COORDINATES (WGS84)</div>
-      <div id="hudCoords" class="hud-value" style="font-size: clamp(1.4rem, 2.5vw, 1.9rem);">00.0000, 00.0000</div>
-      <div class="hud-sub mono" id="hudBearing">BEARING: ---° N</div>
-    </div>
-
-    <!-- Card 2: Speedometer -->
-    <div class="card card--speed">
-      <div class="hud-label">VELOCITY / SPEED</div>
-      <div id="hudSpeed" class="hud-value">0.0 <span style="font-size: 1.2rem;">KM/H</span></div>
-      <div class="speed-bar-container">
-        <div id="speedBar" class="speed-bar-fill"></div>
+    <!-- Live Telemetry HUD Cards -->
+    <section class="grid-4">
+      <!-- Card 1: GPS Position -->
+      <div class="card card--telemetry">
+        <div class="hud-label">COORDINATES (WGS84)</div>
+        <div id="hudCoords" class="hud-value">00.0000, 00.0000</div>
+        <div class="hud-sub mono" id="hudBearing">BEARING: ---° N</div>
       </div>
-      <div class="hud-sub mono" id="hudSpeedMph">0.0 MPH</div>
-    </div>
 
-    <!-- Card 3: Altitude & Precision -->
-    <div class="card card--altitude">
-      <div class="hud-label">ALTITUDE &amp; ACCURACY</div>
-      <div id="hudAltitude" class="hud-value">-- M</div>
-      <div class="hud-sub mono" id="hudAccuracy">ACCURACY RADIUS: ± -- M</div>
-    </div>
-
-    <!-- Card 4: Device Health & Telemetry -->
-    <div class="card card--device">
-      <div class="hud-label">DEVICE STATE</div>
-      <div id="hudBattery" class="hud-value">--%</div>
-      <div class="hud-sub mono" id="hudLastSeen">PINGS: 0 | PENDING</div>
-    </div>
-  </section>
-
-  <!-- Map Display Card -->
-  <section class="map-container-card">
-    <div class="map-toolbar">
-      <div style="font-weight: 900; font-size: 1.1rem; text-transform: uppercase;">
-        LIVE TACTICAL RADAR [BREADCRUMB TRAIL]
+      <!-- Card 2: Speedometer -->
+      <div class="card card--speed">
+        <div class="hud-label">VELOCITY / SPEED</div>
+        <div id="hudSpeed" class="hud-value">0.0 <span style="font-size: 1.1rem; opacity: 0.7;">KM/H</span></div>
+        <div class="speed-bar-container">
+          <div id="speedBar" class="speed-bar-fill"></div>
+        </div>
+        <div class="hud-sub mono" id="hudSpeedMph">0.0 MPH</div>
       </div>
-      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <button id="recenterBtn" class="button" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">RECENTER</button>
-        <button id="clearTrailBtn" class="button button--red" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">CLEAR TRAIL</button>
-        <button id="exportGpxBtn" class="button button--primary" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">EXPORT GPX</button>
+
+      <!-- Card 3: Altitude & Precision -->
+      <div class="card card--altitude">
+        <div class="hud-label">ALTITUDE &amp; ACCURACY</div>
+        <div id="hudAltitude" class="hud-value">-- M</div>
+        <div class="hud-sub mono" id="hudAccuracy">ACCURACY RADIUS: ± -- M</div>
       </div>
-    </div>
-    <div id="map"></div>
-  </section>
 
-  <!-- Raw Encrypted Packet Inspector (Cryptographic Proof) -->
-  <section class="card" style="margin-bottom: 2rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-      <h3 style="color: var(--accent-yellow); margin: 0;">02. CRYPTOGRAPHIC RAW PACKET STREAM</h3>
-      <span class="mono" style="font-size: 0.85rem; color: var(--text-muted);">DECRYPTING REAL-TIME</span>
-    </div>
-    <div id="packetLog" class="log-box">
-      [00:00:00] STANDBY: Awaiting WebSocket connection and incoming encrypted location envelopes...
-    </div>
-  </section>
+      <!-- Card 4: Active Device Info -->
+      <div class="card card--device">
+        <div class="hud-label" id="hudDeviceNameLabel">SELECTED DEVICE</div>
+        <div id="hudBattery" class="hud-value">--%</div>
+        <div class="hud-sub mono" id="hudLastSeen">PINGS: 0 | AWAITING SIGNAL</div>
+      </div>
+    </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div>BRUTAL//TRACK · OPEN-SOURCE ZERO-LEAK GPS TELEMETRY</div>
-    <div>DESIGN: REFINED BRUTALISM // E2EE VERIFIED</div>
-  </footer>
+    <!-- Map Display Card -->
+    <section class="map-container-card">
+      <div class="map-toolbar">
+        <div class="toolbar-device-title" id="mapActiveDeviceTitle">
+          RADAR MAP // ALL DEVICES ACTIVE
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="recenterBtn" class="button button--ghost" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">RECENTER</button>
+          <button id="clearTrailBtn" class="button button--ghost" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">CLEAR TRAILS</button>
+          <button id="exportGpxBtn" class="button button--ghost" style="padding: 0.35rem 0.9rem; font-size: 0.85rem;">EXPORT GPX</button>
+        </div>
+      </div>
+      <div id="map"></div>
+    </section>
+
+    <!-- Settings / Sync Drawer (Clean, Subtle) -->
+    <details class="card details-drawer" style="margin-bottom: 2rem;">
+      <summary style="font-weight: 800; cursor: pointer; text-transform: uppercase;">
+        ADVANCED RELAY &amp; CONNECTION SETTINGS
+      </summary>
+      <div class="grid" style="margin-top: 1.25rem;">
+        <div class="form-group">
+          <label for="brokerSelect">MQTT RELAY BROKER (WSS ENCRYPTED TRANSPORT)</label>
+          <select id="brokerSelect" class="input" style="cursor: pointer;">
+            <option value="wss://broker.hivemq.com:8884/mqtt">HiveMQ Public Secure WSS [wss://broker.hivemq.com:8884/mqtt]</option>
+            <option value="wss://broker.emqx.io:8084/mqtt">EMQX Public Secure WSS [wss://broker.emqx.io:8084/mqtt]</option>
+            <option value="custom">CUSTOM WEBSOCKET URL...</option>
+          </select>
+        </div>
+        <div class="form-group" id="customBrokerGroup" style="display: none;">
+          <label for="customBrokerInput">CUSTOM WEBSOCKET URL</label>
+          <input type="text" id="customBrokerInput" class="input" placeholder="wss://your-server:8084/mqtt">
+        </div>
+      </div>
+      <div class="button-group">
+        <button id="copyShareBtn" class="button button--ghost">COPY ONE-CLICK PAIRING LINK</button>
+        <button id="soundToggleBtn" class="button button--ghost">AUDIO CHIRP: OFF</button>
+      </div>
+    </details>
+
+    <!-- Raw Encrypted Packet Inspector (Cryptographic Proof) -->
+    <section class="card" style="margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <h3 style="margin: 0; font-size: 1rem;">CRYPTOGRAPHIC PACKET STREAM</h3>
+        <span class="mono" style="font-size: 0.8rem; color: var(--text-muted);">AES-256-GCM VERIFIED</span>
+      </div>
+      <div id="packetLog" class="log-box">
+        [00:00:00] STANDBY: Awaiting WebSocket connection and incoming encrypted location packets...
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div>ARKA MANDAL // PRIVATE ZERO-LEAK GPS TELEMETRY</div>
+      <div>E2EE AES-256-GCM // MULTI-DEVICE SUPPORTED</div>
+    </footer>
+  </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <!-- MQTT.js for browser WebSocket connection -->
   <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
-  <!-- Crypto Core -->
+  <!-- Crypto Engine -->
   <script src="crypto.js"></script>
   <!-- Application Logic -->
   <script src="app.js"></script>

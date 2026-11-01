@@ -21,9 +21,23 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_PATH") ?: "/home/arka/.android/brutaltrack-release.keystore"
+            val ksFile = file(keystorePath)
+            if (ksFile.exists()) {
+                storeFile = ksFile
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "ArkaMandalKey2026"
+                keyAlias = System.getenv("KEY_ALIAS") ?: "brutaltrack"
+                keyPassword = System.getenv("KEY_PASSWORD") ?: "ArkaMandalKey2026"
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

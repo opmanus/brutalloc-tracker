@@ -51,6 +51,7 @@ class LocationService : Service() {
     private var mqttPublisher: MqttPublisher? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
+    private var deviceName: String = "Arka's Phone"
     private var channelId: String = "alpha-squad-01"
     private var passphrase: String = "hackme-if-you-can"
     private var brokerHost: String = "broker.hivemq.com"
@@ -64,6 +65,7 @@ class LocationService : Service() {
         const val CHANNEL_ID_NOTIFICATION = "brutal_tracker_channel"
         const val NOTIFICATION_ID = 1337
 
+        const val EXTRA_DEVICE_NAME = "EXTRA_DEVICE_NAME"
         const val EXTRA_CHANNEL = "EXTRA_CHANNEL"
         const val EXTRA_PASSPHRASE = "EXTRA_PASSPHRASE"
         const val EXTRA_BROKER_HOST = "EXTRA_BROKER_HOST"
@@ -94,6 +96,7 @@ class LocationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START -> {
+                deviceName = intent.getStringExtra(EXTRA_DEVICE_NAME) ?: deviceName
                 channelId = intent.getStringExtra(EXTRA_CHANNEL) ?: channelId
                 passphrase = intent.getStringExtra(EXTRA_PASSPHRASE) ?: passphrase
                 brokerHost = intent.getStringExtra(EXTRA_BROKER_HOST) ?: brokerHost
@@ -223,6 +226,7 @@ class LocationService : Service() {
 
         val packet = LocationPacket(
             deviceId = deviceId,
+            deviceName = deviceName,
             lat = loc.latitude,
             lon = loc.longitude,
             alt = loc.altitude,

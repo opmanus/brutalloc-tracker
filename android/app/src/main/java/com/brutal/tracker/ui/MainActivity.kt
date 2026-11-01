@@ -73,7 +73,8 @@ class MainActivity : ComponentActivity() {
     private fun startTrackingService(config: TrackerConfig) {
         val intent = Intent(this, LocationService::class.java).apply {
             action = LocationService.ACTION_START
-            putExtra(LocationService.EXTRA_CHANNEL, config.channelId)
+            putExtra(LocationService.EXTRA_DEVICE_NAME, config.deviceName)
+            putExtra(LocationService.EXTRA_CHANNEL, config.derivedChannel)
             putExtra(LocationService.EXTRA_PASSPHRASE, config.passphrase)
             putExtra(LocationService.EXTRA_BROKER_HOST, config.brokerHost)
             putExtra(LocationService.EXTRA_BROKER_PORT, config.brokerPort)
